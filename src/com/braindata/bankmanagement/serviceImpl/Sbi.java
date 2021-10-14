@@ -10,6 +10,7 @@ public class Sbi implements Rbi {
 	Scanner sc = new Scanner(System.in);
 	Account ac = new Account();
 	Random random = new Random();
+	short attempt = 3;
 
 	public void createAccount() {
 
@@ -41,7 +42,7 @@ public class Sbi implements Rbi {
 		generateAccNo();
 
 		System.out.println(
-				"Your Account Number is : " + ac.getAccNo() + " Please use this Account Number for Baning Features");
+				"YOUR ACCOUNT NUMBER IS : " + ac.getAccNo() + " Please use this Account Number for BanKing Features");
 		System.out.println("-------------------------------------------");
 
 	}
@@ -55,7 +56,7 @@ public class Sbi implements Rbi {
 		System.out.println("Gender               : " + ac.getGender());
 		System.out.println("Age                  : " + ac.getAge() + " years");
 		System.out.println("Current balance      : " + ac.getBalance());
-
+		System.out.println("Withdrawal attempts left: " + attempt);
 		System.out.println("-------------------------------------------");
 	}
 
@@ -92,67 +93,80 @@ public class Sbi implements Rbi {
 
 	public void withdrawal() {
 
-		System.out.print("Enter Account Number: ");
-		int input = sc.nextInt();
-		int accNo = ac.getAccNo();
-
-		/*
-		 * Condition to Verify Account Number
-		 */
-		if (accNo == input) {
-			double balance = ac.getBalance();
+		if (attempt > 0) {
+			System.out.println("Withdrawal attempt " + (4-attempt) + " out of 3");
+			System.out.print("Enter Account Number: ");
+			int input = sc.nextInt();
+			int accNo = ac.getAccNo();
 
 			/*
-			 * Condition to Check if Current Balance is Already Greater than Minimum Balance
+			 * Condition to Verify Account Number
 			 */
-			if (balance > 1000) {
-				System.out.print("Enter Ammount to Withdraw: ");
-				double withdraw = sc.nextDouble();
+			if (accNo == input) {
+				double balance = ac.getBalance();
 
-				if (withdraw >= 500) {
+				/*
+				 * Condition to Check if Current Balance is Already Greater than Minimum Balance
+				 */
+				if (balance > 1000) {
+					System.out.print("Enter Ammount to Withdraw: ");
+					double withdraw = sc.nextDouble();
+
 					/*
-					 * Condition to Check Withdrawal amount is Less than Current Balance
+					 * Condition to check Amount is multiple of 100
 					 */
-					if (balance >= withdraw) {
-						double newBalance = balance - withdraw;
+					if (withdraw % 100 == 0) {
 
 						/*
-						 * Condition to ensure New Balance after withdrawal must be Greater than Minimum
-						 * Balance
+						 * Condition to Check Withdrawal amount is Less than Current Balance
 						 */
-						if (newBalance >= 1000) {
-							ac.setBalance(newBalance);
-							System.out.println("Ammount " + withdraw + " withdrawn Successfully....");
-							System.out.println("-------------------------------------------");
-						} else {
-							System.out.println("\nFailed to Withdraw...you can NOT withdraw '" + withdraw
-									+ "' from your current balance '" + balance + " rs.' ");
-							System.out.println("You must Maintain MINIMUM BALANCE '1000 rs.'");
-							System.out.println("-------------------------------------------");
-						}
+						if (balance >= withdraw) {
+							double newBalance = balance - withdraw;
 
+							/*
+							 * Condition to ensure New Balance after withdrawal must be Greater than Minimum
+							 * Balance
+							 */
+							if (newBalance >= 1000) {
+								ac.setBalance(newBalance);
+								System.out.println("Ammount " + withdraw + " withdrawn Successfully....");
+								System.out.println("-------------------------------------------");
+								attempt--;
+							} else {
+								System.out.println("\nFailed to Withdraw...you can NOT withdraw '" + withdraw
+										+ "' from your current balance '" + balance + " rs.' ");
+								System.out.println("You must Maintain MINIMUM BALANCE '1000 rs.'");
+								System.out.println("-------------------------------------------");
+							}
+
+						} else {
+							System.out.println("Insufficent Balance in your account...Try Again");
+							System.out.println("Your Current Balance : " + balance);
+							withdrawal();
+						}
 					} else {
-						System.out.println("Insufficent Balance in your account...Try Again");
-						System.out.println("Your Current Balance : " + balance);
+						System.out.println("Please Enter Amount multiple of 100 ");
 						withdrawal();
+
 					}
 				} else {
-					System.out.println("Please Enter Amount Greater Than 500 rs.");
-					withdrawal();
-					
+					System.out.println("Your Current Balance : " + balance + " rs.");
+					System.out.println("Minimum Balance to be maintained : 1000 rs.");
+					System.out.println(
+							"Failed to withdraw...Your current balance is already at MINIMUM BALANCE aproved ");
+					System.out.println("-------------------------------------------");
 				}
 			} else {
-				System.out.println("Your Current Balance : " + balance + " rs.");
-				System.out.println("Minimum Balance to be maintained : 1000 rs.");
-				System.out.println("Failed to withdraw...Your current balance is already at MINIMUM BALANCE aproved ");
-				System.out.println("-------------------------------------------");
+				System.out.println("Inorrect Account Number...");
+
+				withdrawal();
 			}
+			
 		} else {
-			System.out.println("Inorrect Account Number...");
-
-			withdrawal();
+			System.out.println("You have Exhausted withdrawal attempt limit of 3 for the day");
+			System.out.println("Please visit after 24 hrs....");
+			System.out.println("-------------------------------------------");
 		}
-
 	}
 
 	public void checkBalance() {
@@ -201,8 +215,12 @@ public class Sbi implements Rbi {
 	}
 
 	public void generateAccNo() {
+		int min = 1000;
+		int max = 9999;
+		int accNo1 = (int) (Math.random() * (max - min + 1) + min);
+		/* Or */
 		int accNo = random.nextInt(9999);
-		ac.setAccNo(accNo);
+		ac.setAccNo(accNo1);
 
 	}
 
