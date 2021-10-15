@@ -3,6 +3,7 @@ package com.braindata.bankmanagement.serviceImpl;
 import com.braindata.bankmanagement.service.Rbi;
 import com.braindata.bankmanagement.model.Account;
 import java.util.Scanner;
+import java.util.InputMismatchException;
 import java.util.Random;//To Generate Account Number
 
 public class Sbi implements Rbi {
@@ -11,12 +12,114 @@ public class Sbi implements Rbi {
 	Account ac = new Account();
 	Random random = new Random();
 	short attempt = 3;
+	boolean flag = false;
+	
+	public void mainMenu() {
+		System.out.println("-------------------------------------------");
+		System.out.println("Choose from Following operations..");
+		System.out.println("\n 1.Create Account");
+		System.out.println(" 2.Display Account Details");
+		System.out.println(" 3.Check Balance");
+		System.out.println(" 4.Deposit Money");
+		System.out.println(" 5.Withdraw Money");
+		System.out.println(" 0.Exit");
 
+		int input = sc.nextInt();
+
+		switch (input) {
+		case 1:
+			flag = true;
+			System.out.println("-------------------------------------------");
+			System.out.println("  *REGISTRATION*");
+			createAccount();
+			break;
+
+		case 2:
+			if (flag) {
+				System.out.println("-------------------------------------------");
+				displayAllDetails();
+				break;
+			} else {
+				System.out.println("No Account Found..");
+				System.out.println("Create an Account First to Use this Operation");
+				mainMenu();
+				break;
+			}
+
+		case 3:
+
+			if (flag) {
+				System.out.println("-------------------------------------------");
+				System.out.println("	*BALANCE CHECK*");
+				checkBalance();
+				break;
+			} else {
+				System.out.println("No Account Found..");
+				System.out.println("Create an Account First to Use this Operation");
+				mainMenu();
+				break;
+			}
+
+		case 4:
+			if (flag) {
+				System.out.println("-------------------------------------------");
+				System.out.println("	*DEPOSIT MONEY*");
+				depositMoney();
+				break;
+			} else {
+				System.out.println("No Account Found..");
+				System.out.println("Create an Account First to Use this Operation");
+				mainMenu();
+				break;
+			}
+
+		case 5:
+			if (flag) {
+				System.out.println("-------------------------------------------");
+				System.out.println("	*WITHDRAW MONEY*");
+				withdrawal();
+				break;
+			} else {
+				System.out.println("No Account Found..");
+				System.out.println("Create an Account First to Use this Operation");
+				mainMenu();
+				break;
+			}
+
+		case 0:
+			System.out.println("Thank You for banking with us!!");
+			System.exit(0);
+			break;
+
+		}
+	}
+	public void subMenu() {
+		System.out.println("Enter '5' for Main Menu Or '0' for Exit");
+		byte input = sc.nextByte();
+		switch (input) {
+		case 5:
+			mainMenu();
+			break;
+		case 0:
+			System.out.println("Thank You for banking with us!!");
+			System.exit(0);
+		default:
+			System.out.println("Enter Valid Input!!");
+			subMenu();
+			break;
+		}
+		
+	}
+	
+	
 	public void createAccount() {
 
-		System.out.print("Enter Account Name :  ");
+		System.out.print("\nEnter Account Name :  ");
 		String name = sc.next();
 		ac.setName(name);
+		
+		/* Code to set and check if Age is Equal or Greater than 18 */
+		setAge();
 
 		System.out.print("Enter Mobile Number : ");
 		String mob = sc.next();
@@ -30,8 +133,7 @@ public class Sbi implements Rbi {
 		String gender = sc.next();
 		ac.setGender(gender);
 
-		/* Code to set and check if Age is Equal or Greater than 18 */
-		setAge();
+		
 
 		/* Code to get and Check if Initial Deposit is Greater than or equal 1000 rs. */
 		initialDeposit();
@@ -42,11 +144,49 @@ public class Sbi implements Rbi {
 		generateAccNo();
 
 		System.out.println(
-				"YOUR ACCOUNT NUMBER IS : " + ac.getAccNo() + " Please use this Account Number for BanKing Features");
+				"\nYOUR ACCOUNT NUMBER IS : " + ac.getAccNo() + " Please use this Account Number for BanKing Features");
 		System.out.println("-------------------------------------------");
-
+		subMenu();
 	}
 
+	public void setAge() {
+	    Scanner ag = new Scanner(System.in);
+		int age = 0;
+		System.out.print("Enter Age: ");
+		try {
+			age = ag.nextInt();
+		} catch (Exception e) {
+			System.out.println("Invalid Age !! Try again... ");
+		} finally {
+			if (age != 0) {
+				if (age >= 18) {
+					ac.setAge(age);
+				
+				} else {
+				
+					System.out.println(
+							"You are not Eligible to Create a Bank Account(Eligibility age to create a bank account is 18 or more)");
+					System.exit(0);
+				}
+			} else {
+				setAge();
+			}
+			
+		}
+	}
+	
+	public void setMobNo() {
+		
+	}
+	public void generateAccNo() {
+		int min = 1000;
+		int max = 9999;
+		int accNo1 = (int) (Math.random() * (max - min + 1) + min);
+		/* Or */
+		int accNo = random.nextInt(9999);
+		ac.setAccNo(accNo1);
+	
+	}
 	public void displayAllDetails() {
 		System.out.println("	*ACCOUNT DETAILS*");
 		System.out.println("Account Number       : " + ac.getAccNo());
@@ -58,6 +198,7 @@ public class Sbi implements Rbi {
 		System.out.println("Current balance      : " + ac.getBalance());
 		System.out.println("Withdrawal attempts left: " + attempt);
 		System.out.println("-------------------------------------------");
+		subMenu();
 	}
 
 	public void depositMoney() {
@@ -79,7 +220,7 @@ public class Sbi implements Rbi {
 
 				ac.setBalance(balance);
 
-				System.out.println("Ammount " + deposit + " deposited in your account successfully....");
+				System.out.println("Congratulations...Ammount " + deposit + " deposited in your account successfully....");
 				System.out.println("-------------------------------------------");
 			} else {
 				System.out.println("Failed Deposit...Can NOT deposit Amount less than 500 rs.");
@@ -89,12 +230,13 @@ public class Sbi implements Rbi {
 			System.out.println("Inorrect Account Number...Try Again..");
 			depositMoney();
 		}
+		subMenu();
 	}
 
 	public void withdrawal() {
 
 		if (attempt > 0) {
-			System.out.println("Withdrawal attempt " + (4-attempt) + " out of 3");
+			System.out.println("Withdrawal attempt " + (4 - attempt) + " out of 3");
 			System.out.print("Enter Account Number: ");
 			int input = sc.nextInt();
 			int accNo = ac.getAccNo();
@@ -161,12 +303,13 @@ public class Sbi implements Rbi {
 
 				withdrawal();
 			}
-			
+
 		} else {
 			System.out.println("You have Exhausted withdrawal attempt limit of 3 for the day");
 			System.out.println("Please visit after 24 hrs....");
 			System.out.println("-------------------------------------------");
 		}
+		subMenu();
 	}
 
 	public void checkBalance() {
@@ -185,7 +328,7 @@ public class Sbi implements Rbi {
 			System.out.println("Enter Correct Account Number");
 			checkBalance();
 		}
-
+		subMenu();
 	}
 
 	public void initialDeposit() {
@@ -199,28 +342,6 @@ public class Sbi implements Rbi {
 		} else {
 			ac.setBalance(iniDep);
 		}
-
-	}
-
-	public void setAge() {
-		System.out.print("Enter Age:  ");
-		int age = sc.nextInt();
-		if (age >= 18) {
-			ac.setAge(age);
-		} else {
-			System.out.println(
-					"You are not Eligible to Create a Bank Account(Eligibility age to create a bank account is 18 or more)");
-			System.exit(0);
-		}
-	}
-
-	public void generateAccNo() {
-		int min = 1000;
-		int max = 9999;
-		int accNo1 = (int) (Math.random() * (max - min + 1) + min);
-		/* Or */
-		int accNo = random.nextInt(9999);
-		ac.setAccNo(accNo1);
 
 	}
 

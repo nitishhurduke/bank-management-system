@@ -11,5 +11,7 @@ public interface Rbi {
 	public void withdrawal();
 
 	public void checkBalance();
+	
+	public void mainMenu();
 
 }
