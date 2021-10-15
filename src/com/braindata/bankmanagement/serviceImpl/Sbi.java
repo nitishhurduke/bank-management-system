@@ -3,11 +3,10 @@ package com.braindata.bankmanagement.serviceImpl;
 import com.braindata.bankmanagement.service.Rbi;
 import com.braindata.bankmanagement.model.Account;
 import java.util.Scanner;
-import java.util.InputMismatchException;
 import java.util.Random;//To Generate Account Number
 
 public class Sbi implements Rbi {
-
+ 
 	Scanner sc = new Scanner(System.in);
 	Account ac = new Account();
 	Random random = new Random();

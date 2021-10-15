@@ -1,0 +1,478 @@
+[33mcommit fefcb1816bcf1e9d5a29f9b497cf665d040ab284[m[33m ([m[1;36mHEAD -> [m[1;32mmaster[m[33m, [m[1;32mdevelopment[m[33m)[m
+Author: nitishhurduke <nitishhurduke@gmail.com>
+Date:   Fri Oct 15 16:24:21 2021 +0530
+
+    16:18 15/10/2021
+    
+    *New Features Added -
+    
+            1.Mobile Number MUST be of 10 digits ONLY.
+            2.Aadhaar No. MUST be of 12 digits ONLY.
+    
+    *Changes-
+    
+            1.If Deposit amout <500 goes to subMenu
+            2.If Insufficient balance while withdrawal goes to subMenu
+    
+    *Bugs Fixes-
+    
+            InputMismatchExceptions Handled in
+                    1.MainMenu
+                    2.SubMenu
+                    3.setMob
+                    4.setAdhar
+
+[1mdiff --git a/bin/com/braindata/bankmanagement/model/Account.class b/bin/com/braindata/bankmanagement/model/Account.class[m
+[1mindex d8987ef..cfe591c 100644[m
+Binary files a/bin/com/braindata/bankmanagement/model/Account.class and b/bin/com/braindata/bankmanagement/model/Account.class differ
+[1mdiff --git a/bin/com/braindata/bankmanagement/serviceImpl/Sbi.class b/bin/com/braindata/bankmanagement/serviceImpl/Sbi.class[m
+[1mindex 625269c..044cf78 100644[m
+Binary files a/bin/com/braindata/bankmanagement/serviceImpl/Sbi.class and b/bin/com/braindata/bankmanagement/serviceImpl/Sbi.class differ
+[1mdiff --git a/src/com/braindata/bankmanagement/model/Account.java b/src/com/braindata/bankmanagement/model/Account.java[m
+[1mindex 74ac263..089ace7 100644[m
+[1m--- a/src/com/braindata/bankmanagement/model/Account.java[m
+[1m+++ b/src/com/braindata/bankmanagement/model/Account.java[m
+[36m@@ -3,8 +3,8 @@[m [mpackage com.braindata.bankmanagement.model;[m
+ public class Account {[m
+ 	private int accNo;[m
+ 	private String name;[m
+[31m-	private String mobNo;[m
+[31m-	private String adharno;[m
+[32m+[m	[32mprivate long mobNo;[m
+[32m+[m	[32mprivate long adharno;[m
+ 	private String gender;[m
+ 	private int age;[m
+ 	private double balance;[m
+[36m@@ -17,11 +17,11 @@[m [mpublic class Account {[m
+ 		this.name = name;[m
+ 	}[m
+ [m
+[31m-	public void setMobNo(String mobNo) {[m
+[32m+[m	[32mpublic void setMobNo(long mobNo) {[m
+ 		this.mobNo = mobNo;[m
+ 	}[m
+ [m
+[31m-	public void setAdharNo(String adharno) {[m
+[32m+[m	[32mpublic void setAdharNo(long adharno) {[m
+ 		this.adharno = adharno;[m
+ 	}[m
+ [m
+[36m@@ -45,11 +45,11 @@[m [mpublic class Account {[m
+ 		return name;[m
+ 	}[m
+ [m
+[31m-	public String getMobNo() {[m
+[32m+[m	[32mpublic long getMobNo() {[m
+ 		return mobNo;[m
+ 	}[m
+ [m
+[31m-	public String getAdharNo() {[m
+[32m+[m	[32mpublic long getAdharNo() {[m
+ 		return adharno;[m
+ 	}[m
+ [m
+[1mdiff --git a/src/com/braindata/bankmanagement/serviceImpl/Sbi.java b/src/com/braindata/bankmanagement/serviceImpl/Sbi.java[m
+[1mindex b9a7314..fe3f35f 100644[m
+[1m--- a/src/com/braindata/bankmanagement/serviceImpl/Sbi.java[m
+[1m+++ b/src/com/braindata/bankmanagement/serviceImpl/Sbi.java[m
+[36m@@ -13,8 +13,12 @@[m [mpublic class Sbi implements Rbi {[m
+ 	Random random = new Random();[m
+ 	short attempt = 3;[m
+ 	boolean flag = false;[m
+[31m-	[m
+[32m+[m
+ 	public void mainMenu() {[m
+[32m+[m
+[32m+[m		[32mScanner in = new Scanner(System.in);[m
+[32m+[m		[32mint input = 1772;[m
+[32m+[m
+ 		System.out.println("-------------------------------------------");[m
+ 		System.out.println("Choose from Following operations..");[m
+ 		System.out.println("\n 1.Create Account");[m
+[36m@@ -23,118 +27,135 @@[m [mpublic class Sbi implements Rbi {[m
+ 		System.out.println(" 4.Deposit Money");[m
+ 		System.out.println(" 5.Withdraw Money");[m
+ 		System.out.println(" 0.Exit");[m
+[32m+[m		[32mtry {[m
+[32m+[m			[32minput = in.nextInt();[m
+[32m+[m		[32m} catch (Exception e) {[m
+[32m+[m			[32mSystem.out.println("! Invalid Entry...");[m
+[32m+[m		[32m} finally {[m
+[32m+[m			[32mif (input != 1772) {[m
+[32m+[m				[32mswitch (input) {[m
+[32m+[m				[32mcase 1:[m
+[32m+[m					[32mflag = true;[m
+[32m+[m					[32mSystem.out.println("-------------------------------------------");[m
+[32m+[m					[32mSystem.out.println("  *REGISTRATION*");[m
+[32m+[m					[32mcreateAccount();[m
+[32m+[m					[32mbreak;[m
+[32m+[m
+[32m+[m				[32mcase 2:[m
+[32m+[m					[32mif (flag) {[m
+[32m+[m						[32mSystem.out.println("-------------------------------------------");[m
+[32m+[m						[32mdisplayAllDetails();[m
+[32m+[m						[32mbreak;[m
+[32m+[m					[32m} else {[m
+[32m+[m						[32mSystem.out.println("No Account Found..");[m
+[32m+[m						[32mSystem.out.println("Create an Account First to Use this Operation");[m
+[32m+[m						[32mmainMenu();[m
+[32m+[m						[32mbreak;[m
+[32m+[m					[32m}[m
+ [m
+[31m-		int input = sc.nextInt();[m
+[32m+[m				[32mcase 3:[m
+ [m
+[31m-		switch (input) {[m
+[31m-		case 1:[m
+[31m-			flag = true;[m
+[31m-			System.out.println("-------------------------------------------");[m
+[31m-			System.out.println("  *REGISTRATION*");[m
+[31m-			createAccount();[m
+[31m-			break;[m
+[32m+[m					[32mif (flag) {[m
+[32m+[m						[32mSystem.out.println("-------------------------------------------");[m
+[32m+[m						[32mSystem.out.println("	*BALANCE CHECK*");[m
+[32m+[m						[32mcheckBalance();[m
+[32m+[m						[32mbreak;[m
+[32m+[m					[32m} else {[m
+[32m+[m						[32mSystem.out.println("No Account Found..");[m
+[32m+[m						[32mSystem.out.println("Create an Account First to Use this Operation");[m
+[32m+[m						[32mmainMenu();[m
+[32m+[m						[32mbreak;[m
+[32m+[m					[32m}[m
+ [m
+[31m-		case 2:[m
+[31m-			if (flag) {[m
+[31m-				System.out.println("-------------------------------------------");[m
+[31m-				displayAllDetails();[m
+[31m-				break;[m
+[31m-			} else {[m
+[31m-				System.out.println("No Account Found..");[m
+[31m-				System.out.println("Create an Account First to Use this Operation");[m
+[31m-				mainMenu();[m
+[31m-				break;[m
+[31m-			}[m
+[32m+[m				[32mcase 4:[m
+[32m+[m					[32mif (flag) {[m
+[32m+[m						[32mSystem.out.println("-------------------------------------------");[m
+[32m+[m						[32mSystem.out.println("	*DEPOSIT MONEY*");[m
+[32m+[m						[32mdepositMoney();[m
+[32m+[m						[32mbreak;[m
+[32m+[m					[32m} else {[m
+[32m+[m						[32mSystem.out.println("No Account Found..");[m
+[32m+[m						[32mSystem.out.println("Create an Account First to Use this Operation");[m
+[32m+[m						[32mmainMenu();[m
+[32m+[m						[32mbreak;[m
+[32m+[m					[32m}[m
+ [m
+[31m-		case 3:[m
+[32m+[m				[32mcase 5:[m
+[32m+[m					[32mif (flag) {[m
+[32m+[m						[32mSystem.out.println("-------------------------------------------");[m
+[32m+[m						[32mSystem.out.println("	*WITHDRAW MONEY*");[m
+[32m+[m						[32mwithdrawal();[m
+[32m+[m						[32mbreak;[m
+[32m+[m					[32m} else {[m
+[32m+[m						[32mSystem.out.println("No Account Found..");[m
+[32m+[m						[32mSystem.out.println("Create an Account First to Use this Operation");[m
+[32m+[m						[32mmainMenu();[m
+[32m+[m						[32mbreak;[m
+[32m+[m					[32m}[m
+ [m
+[31m-			if (flag) {[m
+[31m-				System.out.println("-------------------------------------------");[m
+[31m-				System.out.println("	*BALANCE CHECK*");[m
+[31m-				checkBalance();[m
+[31m-				break;[m
+[31m-			} else {[m
+[31m-				System.out.println("No Account Found..");[m
+[31m-				System.out.println("Create an Account First to Use this Operation");[m
+[31m-				mainMenu();[m
+[31m-				break;[m
+[31m-			}[m
+[32m+[m				[32mcase 0:[m
+[32m+[m					[32mSystem.out.println("Thank You for banking with us!!");[m
+[32m+[m					[32mSystem.exit(0);[m
+[32m+[m					[32mbreak;[m
+ [m
+[31m-		case 4:[m
+[31m-			if (flag) {[m
+[31m-				System.out.println("-------------------------------------------");[m
+[31m-				System.out.println("	*DEPOSIT MONEY*");[m
+[31m-				depositMoney();[m
+[31m-				break;[m
+[31m-			} else {[m
+[31m-				System.out.println("No Account Found..");[m
+[31m-				System.out.println("Create an Account First to Use this Operation");[m
+[31m-				mainMenu();[m
+[31m-				break;[m
+[31m-			}[m
+[32m+[m				[32mdefault:[m
+[32m+[m					[32mSystem.out.println("! Invalid Entry...");[m
+[32m+[m					[32mmainMenu();[m
+ [m
+[31m-		case 5:[m
+[31m-			if (flag) {[m
+[31m-				System.out.println("-------------------------------------------");[m
+[31m-				System.out.println("	*WITHDRAW MONEY*");[m
+[31m-				withdrawal();[m
+[31m-				break;[m
+[32m+[m				[32m}[m
+ 			} else {[m
+[31m-				System.out.println("No Account Found..");[m
+[31m-				System.out.println("Create an Account First to Use this Operation");[m
+ 				mainMenu();[m
+[31m-				break;[m
+ 			}[m
+[31m-[m
+[31m-		case 0:[m
+[31m-			System.out.println("Thank You for banking with us!!");[m
+[31m-			System.exit(0);[m
+[31m-			break;[m
+[31m-[m
+ 		}[m
+ 	}[m
+[32m+[m
+ 	public void subMenu() {[m
+[32m+[m		[32mScanner sub = new Scanner(System.in);[m
+[32m+[m		[32mint input = 1772;[m
+ 		System.out.println("Enter '5' for Main Menu Or '0' for Exit");[m
+[31m-		byte input = sc.nextByte();[m
+[31m-		switch (input) {[m
+[31m-		case 5:[m
+[31m-			mainMenu();[m
+[31m-			break;[m
+[31m-		case 0:[m
+[31m-			System.out.println("Thank You for banking with us!!");[m
+[31m-			System.exit(0);[m
+[31m-		default:[m
+[31m-			System.out.println("Enter Valid Input!!");[m
+[31m-			subMenu();[m
+[31m-			break;[m
+[32m+[m		[32mtry {[m
+[32m+[m			[32minput = sub.nextInt();[m
+[32m+[m		[32m} catch (Exception e) {[m
+[32m+[m			[32mSystem.out.println("! Invalid Entry...");[m
+[32m+[m		[32m} finally {[m
+[32m+[m			[32mif (input != 1772) {[m
+[32m+[m				[32mswitch (input) {[m
+[32m+[m				[32mcase 5:[m
+[32m+[m					[32mmainMenu();[m
+[32m+[m					[32mbreak;[m
+[32m+[m				[32mcase 0:[m
+[32m+[m					[32mSystem.out.println("Thank You for banking with us!!");[m
+[32m+[m					[32mSystem.exit(0);[m
+[32m+[m				[32mdefault:[m
+[32m+[m					[32mSystem.out.println("! Invalid Entry...");[m
+[32m+[m					[32msubMenu();[m
+[32m+[m					[32mbreak;[m
+[32m+[m				[32m}[m
+[32m+[m			[32m} else {[m
+[32m+[m				[32msubMenu();[m
+[32m+[m			[32m}[m
+ 		}[m
+[31m-		[m
+ 	}[m
+[31m-	[m
+[31m-	[m
+[32m+[m
+ 	public void createAccount() {[m
+ [m
+ 		System.out.print("\nEnter Account Name :  ");[m
+ 		String name = sc.next();[m
+ 		ac.setName(name);[m
+[31m-		[m
+[32m+[m
+ 		/* Code to set and check if Age is Equal or Greater than 18 */[m
+ 		setAge();[m
+ [m
+[31m-		System.out.print("Enter Mobile Number : ");[m
+[31m-		String mob = sc.next();[m
+[31m-		ac.setMobNo(mob);[m
+[32m+[m		[32m/* Code to set Mobile Number */[m
+[32m+[m		[32msetMobNo();[m
+ [m
+[31m-		System.out.print("Enter Adhar Number : ");[m
+[31m-		String adhar = sc.next();[m
+[31m-		ac.setAdharNo(adhar);[m
+[32m+[m		[32m/* Code to set Adhar Number */[m
+[32m+[m		[32msetAdhar();[m
+ [m
+ 		System.out.print("Enter Gender : ");[m
+ 		String gender = sc.next();[m
+ 		ac.setGender(gender);[m
+ [m
+[31m-		[m
+[31m-[m
+ 		/* Code to get and Check if Initial Deposit is Greater than or equal 1000 rs. */[m
+ 		initialDeposit();[m
+ [m
+[36m@@ -143,14 +164,14 @@[m [mpublic class Sbi implements Rbi {[m
+ 		/* Code to Generate Account Number */[m
+ 		generateAccNo();[m
+ [m
+[31m-		System.out.println([m
+[31m-				"\nYOUR ACCOUNT NUMBER IS : " + ac.getAccNo() + " Please use this Account Number for BanKing Features");[m
+[32m+[m		[32mSystem.out.println("\nYOUR ACCOUNT NUMBER IS : " + ac.getAccNo()[m
+[32m+[m				[32m+ " Please use your Account Number to experience best of our Banking Features");[m
+ 		System.out.println("-------------------------------------------");[m
+ 		subMenu();[m
+ 	}[m
+ [m
+ 	public void setAge() {[m
+[31m-	    Scanner ag = new Scanner(System.in);[m
+[32m+[m		[32mScanner ag = new Scanner(System.in);[m
+ 		int age = 0;[m
+ 		System.out.print("Enter Age: ");[m
+ 		try {[m
+[36m@@ -161,9 +182,9 @@[m [mpublic class Sbi implements Rbi {[m
+ 			if (age != 0) {[m
+ 				if (age >= 18) {[m
+ 					ac.setAge(age);[m
+[31m-				[m
+[32m+[m
+ 				} else {[m
+[31m-				[m
+[32m+[m
+ 					System.out.println([m
+ 							"You are not Eligible to Create a Bank Account(Eligibility age to create a bank account is 18 or more)");[m
+ 					System.exit(0);[m
+[36m@@ -171,28 +192,76 @@[m [mpublic class Sbi implements Rbi {[m
+ 			} else {[m
+ 				setAge();[m
+ 			}[m
+[31m-			[m
+[32m+[m
+ 		}[m
+ 	}[m
+[31m-	[m
+[32m+[m
+ 	public void setMobNo() {[m
+[31m-		[m
+[32m+[m		[32mlong mobile = 0;[m
+[32m+[m		[32mScanner mob = new Scanner(System.in);[m
+[32m+[m		[32mSystem.out.print("Enter 10 digit Mobile Number : ");[m
+[32m+[m		[32mtry {[m
+[32m+[m			[32mmobile = mob.nextLong();[m
+[32m+[m		[32m} catch (Exception e) {[m
+[32m+[m			[32mSystem.out.println("Invalid Mobile no... Try again...");[m
+[32m+[m		[32m} finally {[m
+[32m+[m			[32mif (mobile != 0) {[m
+[32m+[m				[32mif (mobile >= 1000000000 && mobile <= 9999999999l) {[m
+[32m+[m					[32mac.setMobNo(mobile);[m
+[32m+[m				[32m} else {[m
+[32m+[m					[32mSystem.out.println("Mobile Number MUST be in 10 digits...Try Again...");[m
+[32m+[m					[32msetMobNo();[m
+[32m+[m				[32m}[m
+[32m+[m
+[32m+[m			[32m} else {[m
+[32m+[m				[32msetMobNo();[m
+[32m+[m			[32m}[m
+[32m+[m
+[32m+[m		[32m}[m
+[32m+[m	[32m}[m
+[32m+[m
+[32m+[m	[32mpublic void setAdhar() {[m
+[32m+[m		[32mlong adhar = 0;[m
+[32m+[m		[32mScanner ad = new Scanner(System.in);[m
+[32m+[m		[32mSystem.out.print("Enter 12 digit Aadhaar Number : ");[m
+[32m+[m		[32mtry {[m
+[32m+[m			[32madhar = ad.nextLong();[m
+[32m+[m		[32m} catch (Exception e) {[m
+[32m+[m			[32mSystem.out.println("Invalid Aadhaar no... Try again...");[m
+[32m+[m		[32m} finally {[m
+[32m+[m			[32mif (adhar != 0) {[m
+[32m+[m				[32mif (adhar >= 100000000000l && adhar <= 999999999999l) {[m
+[32m+[m					[32mac.setAdharNo(adhar);[m
+[32m+[m				[32m} else {[m
+[32m+[m					[32mSystem.out.println("Aadhaar Number MUST be in 12 digits...Try Again...");[m
+[32m+[m					[32msetAdhar();[m
+[32m+[m				[32m}[m
+[32m+[m
+[32m+[m			[32m} else {[m
+[32m+[m				[32msetAdhar();[m
+[32m+[m			[32m}[m
+[32m+[m
+[32m+[m		[32m}[m
+[32m+[m
+ 	}[m
+[32m+[m
+ 	public void generateAccNo() {[m
+ 		int min = 1000;[m
+ 		int max = 9999;[m
+ 		int accNo1 = (int) (Math.random() * (max - min + 1) + min);[m
+ 		/* Or */[m
+[31m-		int accNo = random.nextInt(9999);[m
+[32m+[m[32m//		int accNo = random.nextInt(9999);[m
+[32m+[m
+ 		ac.setAccNo(accNo1);[m
+[31m-	[m
+[32m+[m
+ 	}[m
+[32m+[m
+ 	public void displayAllDetails() {[m
+ 		System.out.println("	*ACCOUNT DETAILS*");[m
+ 		System.out.println("Account Number       : " + ac.getAccNo());[m
+ 		System.out.println("Account Holders Name : " + ac.getName());[m
+ 		System.out.println("Mobile Number        : " + ac.getMobNo());[m
+[31m-		System.out.println("Adhar Number         : " + ac.getAdharNo());[m
+[32m+[m		[32mSystem.out.println("Aadhaar Number       : " + ac.getAdharNo());[m
+ 		System.out.println("Gender               : " + ac.getGender());[m
+ 		System.out.println("Age                  : " + ac.getAge() + " years");[m
+ 		System.out.println("Current balance      : " + ac.getBalance());[m
+[36m@@ -220,11 +289,11 @@[m [mpublic class Sbi implements Rbi {[m
+ [m
+ 				ac.setBalance(balance);[m
+ [m
+[31m-				System.out.println("Congratulations...Ammount " + deposit + " deposited in your account successfully....");[m
+[32m+[m				[32mSystem.out.println([m
+[32m+[m						[32m"Congratulations...Ammount " + deposit + " deposited in your account successfully....");[m
+ 				System.out.println("-------------------------------------------");[m
+ 			} else {[m
+ 				System.out.println("Failed Deposit...Can NOT deposit Amount less than 500 rs.");[m
+[31m-				depositMoney();[m
+ 			}[m
+ 		} else {[m
+ 			System.out.println("Inorrect Account Number...Try Again..");[m
+[36m@@ -284,7 +353,8 @@[m [mpublic class Sbi implements Rbi {[m
+ 						} else {[m
+ 							System.out.println("Insufficent Balance in your account...Try Again");[m
+ 							System.out.println("Your Current Balance : " + balance);[m
+[31m-							withdrawal();[m
+[32m+[m							[32mSystem.out.println("-------------------------------------------");[m
+[32m+[m
+ 						}[m
+ 					} else {[m
+ 						System.out.println("Please Enter Amount multiple of 100 ");[m
+[36m@@ -292,15 +362,14 @@[m [mpublic class Sbi implements Rbi {[m
+ [m
+ 					}[m
+ 				} else {[m
+[31m-					System.out.println("Your Current Balance : " + balance + " rs.");[m
+[31m-					System.out.println("Minimum Balance to be maintained : 1000 rs.");[m
+ 					System.out.println([m
+[31m-							"Failed to withdraw...Your current balance is already at MINIMUM BALANCE aproved ");[m
+[32m+[m							[32m"Failed to Withdraw...Your current balance is already at MINIMUM BALANCE aproved ");[m
+[32m+[m					[32mSystem.out.println("*Your Current Balance : " + balance + " rs.");[m
+[32m+[m					[32mSystem.out.println("*Minimum Balance to be maintained : 1000 rs.");[m
+ 					System.out.println("-------------------------------------------");[m
+ 				}[m
+ 			} else {[m
+ 				System.out.println("Inorrect Account Number...");[m
+[31m-[m
+ 				withdrawal();[m
+ 			}[m
+ [m
+[36m@@ -333,10 +402,10 @@[m [mpublic class Sbi implements Rbi {[m
+ [m
+ 	public void initialDeposit() {[m
+ [m
+[31m-		System.out.println("To start banking you must deposit at least 1000 rs. ");[m
+[31m-		System.out.print("Enter amount to deposit initialy: ");[m
+[32m+[m		[32mSystem.out.print("Enter amount to deposit initially: ");[m
+ 		double iniDep = sc.nextDouble();[m
+ 		if (iniDep < 1000) {[m
+[32m+[m			[32mSystem.out.println(" !!! To start banking you MUST deposit at least 1000 rs. ");[m
+ 			System.out.println("Please try again... ");[m
+ 			initialDeposit();[m
+ 		} else {[m
