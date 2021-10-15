@@ -3,8 +3,8 @@ package com.braindata.bankmanagement.model;
 public class Account {
 	private int accNo;
 	private String name;
-	private String mobNo;
-	private String adharno;
+	private long mobNo;
+	private long adharno;
 	private String gender;
 	private int age;
 	private double balance;
@@ -17,11 +17,11 @@ public class Account {
 		this.name = name;
 	}
 
-	public void setMobNo(String mobNo) {
+	public void setMobNo(long mobNo) {
 		this.mobNo = mobNo;
 	}
 
-	public void setAdharNo(String adharno) {
+	public void setAdharNo(long adharno) {
 		this.adharno = adharno;
 	}
 
@@ -45,11 +45,11 @@ public class Account {
 		return name;
 	}
 
-	public String getMobNo() {
+	public long getMobNo() {
 		return mobNo;
 	}
 
-	public String getAdharNo() {
+	public long getAdharNo() {
 		return adharno;
 	}
 
