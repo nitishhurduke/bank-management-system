@@ -6,11 +6,10 @@ import java.util.Scanner;
 import java.util.Random;//To Generate Account Number
 
 public class Sbi implements Rbi {
- 
-	Scanner sc = new Scanner(System.in);
+
+//	Scanner sc = new Scanner(System.in);
 	Account ac = new Account();
 	Random random = new Random();
-	short attempt = 3;
 	boolean flag = false;
 
 	public void mainMenu() {
@@ -34,10 +33,16 @@ public class Sbi implements Rbi {
 			if (input != 1772) {
 				switch (input) {
 				case 1:
+					if(flag == false) {
 					flag = true;
 					System.out.println("-------------------------------------------");
 					System.out.println("  *REGISTRATION*");
 					createAccount();
+					}else {
+						System.out.println("Account Already created...Multiple Accounts Feature Comming Soon...");
+						System.out.println("-------------------------------------------");
+						subMenu();
+					}
 					break;
 
 				case 2:
@@ -56,7 +61,7 @@ public class Sbi implements Rbi {
 
 					if (flag) {
 						System.out.println("-------------------------------------------");
-						System.out.println("	*BALANCE CHECK*");
+						
 						checkBalance();
 						break;
 					} else {
@@ -70,6 +75,7 @@ public class Sbi implements Rbi {
 					if (flag) {
 						System.out.println("-------------------------------------------");
 						System.out.println("	*DEPOSIT MONEY*");
+						compareAccNo();
 						depositMoney();
 						break;
 					} else {
@@ -83,6 +89,7 @@ public class Sbi implements Rbi {
 					if (flag) {
 						System.out.println("-------------------------------------------");
 						System.out.println("	*WITHDRAW MONEY*");
+						compareAccNo();
 						withdrawal();
 						break;
 					} else {
@@ -137,9 +144,9 @@ public class Sbi implements Rbi {
 	}
 
 	public void createAccount() {
-
-		System.out.print("\nEnter Account Name :  ");
-		String name = sc.next();
+		Scanner na = new Scanner(System.in);
+		System.out.print("\nEnter Customer Name :  ");
+		String name = na.nextLine();
 		ac.setName(name);
 
 		/* Code to set and check if Age is Equal or Greater than 18 */
@@ -151,14 +158,13 @@ public class Sbi implements Rbi {
 		/* Code to set Adhar Number */
 		setAdhar();
 
-		System.out.print("Enter Gender : ");
-		String gender = sc.next();
-		ac.setGender(gender);
+		/* Code to set Gender */
+		setGender();
 
 		/* Code to get and Check if Initial Deposit is Greater than or equal 1000 rs. */
 		initialDeposit();
 
-		System.out.println("Congratulations!! Account successfully created.....");
+		System.out.println("\nCongratulations!! Account successfully created.....");
 
 		/* Code to Generate Account Number */
 		generateAccNo();
@@ -244,6 +250,47 @@ public class Sbi implements Rbi {
 
 	}
 
+	public void setGender() {
+
+		Scanner gen = new Scanner(System.in);
+		byte input = 117;
+
+		System.out.println("Select Gender from below -");
+		System.out.println("  1.Male");
+		System.out.println("  2.Female");
+		System.out.println("  3.Other");
+
+		try {
+			input = gen.nextByte();
+		} catch (Exception e) {
+			System.out.println("! Invalid Entry...");
+		} finally {
+			if (input != 117) {
+				switch (input) {
+				case 1:
+					ac.setGender("Male");
+					System.out.println("Selected Gender : " + ac.getGender());
+					break;
+				case 2:
+					ac.setGender("Female");
+					System.out.println("Selected Gender : " + ac.getGender());
+					break;
+				case 3:
+					ac.setGender("Other");
+					System.out.println("Selected Gender : " + ac.getGender());
+					break;
+				default:
+					System.out.println("! Choose from given option Only..");
+					setGender();
+					break;
+				}
+			} else {
+				setGender();
+			}
+		}
+
+	}
+
 	public void generateAccNo() {
 		int min = 1000;
 		int max = 9999;
@@ -257,71 +304,84 @@ public class Sbi implements Rbi {
 
 	public void displayAllDetails() {
 		System.out.println("	*ACCOUNT DETAILS*");
-		System.out.println("Account Number       : " + ac.getAccNo());
-		System.out.println("Account Holders Name : " + ac.getName());
-		System.out.println("Mobile Number        : " + ac.getMobNo());
-		System.out.println("Aadhaar Number       : " + ac.getAdharNo());
-		System.out.println("Gender               : " + ac.getGender());
-		System.out.println("Age                  : " + ac.getAge() + " years");
-		System.out.println("Current balance      : " + ac.getBalance());
-		System.out.println("Withdrawal attempts left: " + attempt);
+		System.out.println("Customer Account Number: " + ac.getAccNo());
+		System.out.println("Customer Name          : " + ac.getName());
+		System.out.println("Mobile Number          : " + ac.getMobNo());
+		System.out.println("Aadhaar Number         : " + ac.getAdharNo());
+		System.out.println("Gender                 : " + ac.getGender());
+		System.out.println("Age                    : " + ac.getAge() + " years");
+		System.out.println("Current balance        : " + ac.getBalance());
+
 		System.out.println("-------------------------------------------");
 		subMenu();
 	}
 
 	public void depositMoney() {
-		System.out.print("Enter Account Number: ");
-		int input = sc.nextInt();
-		int accNo = ac.getAccNo();
-
-		if (accNo == input) {
-			System.out.print("Enter Ammount to Deposit: ");
-			double deposit = sc.nextDouble();
-			/*
-			 * Code to Make sure Deposit Amount is Greater than 500
-			 */
-			if (deposit >= 500) {
-
-				double balance = ac.getBalance();
-
-				balance = balance + deposit;
-
-				ac.setBalance(balance);
-
-				System.out.println(
-						"Congratulations...Ammount " + deposit + " deposited in your account successfully....");
-				System.out.println("-------------------------------------------");
-			} else {
-				System.out.println("Failed Deposit...Can NOT deposit Amount less than 500 rs.");
-			}
-		} else {
-			System.out.println("Inorrect Account Number...Try Again..");
-			depositMoney();
+		Scanner sc = new Scanner(System.in);
+		double deposit = 0;
+		System.out.print("Enter Amount to Deposit: ");
+		try {
+			deposit = sc.nextDouble(); // Risky Code
 		}
-		subMenu();
+		/*
+		 * Code to Make sure Deposit Amount is Greater than 500
+		 */
+		catch (Exception e) {
+			System.out.println("! Invalid Entry");
+		} finally {
+
+			if (deposit != 0) {
+
+				if (deposit >= 500) {
+
+					double balance = ac.getBalance();
+
+					balance = balance + deposit;
+
+					ac.setBalance(balance);
+
+					System.out.println(
+							"Congratulations...Amount " + deposit + " deposited in your account successfully....");
+					System.out.println("-------------------------------------------");
+				} else {
+					System.out.println("Failed Deposit...Can NOT deposit Amount less than 500 rs.");
+				}
+
+				subMenu();
+
+			} else {
+				depositMoney();
+			}
+
+		}
+
 	}
 
 	public void withdrawal() {
+		Scanner sc = new Scanner(System.in);
+		double balance = ac.getBalance();
+		double withdraw = 0;
+		boolean ok = false;
 
-		if (attempt > 0) {
-			System.out.println("Withdrawal attempt " + (4 - attempt) + " out of 3");
-			System.out.print("Enter Account Number: ");
-			int input = sc.nextInt();
-			int accNo = ac.getAccNo();
+		if (balance > 1000) {
+			ok = true;
+		} else {
+			withdrawal();
+		}
 
+		try {
 			/*
-			 * Condition to Verify Account Number
+			 * Condition to Check if Current Balance is Already Greater than Minimum Balance
 			 */
-			if (accNo == input) {
-				double balance = ac.getBalance();
+			System.out.print("Enter Amount to Withdraw: ");
+			withdraw = sc.nextDouble();
 
-				/*
-				 * Condition to Check if Current Balance is Already Greater than Minimum Balance
-				 */
-				if (balance > 1000) {
-					System.out.print("Enter Ammount to Withdraw: ");
-					double withdraw = sc.nextDouble();
+		} catch (Exception e) {
+			System.out.println("! Invalid Entry...Try Again...");
+		} finally {
+			if (withdraw != 0) {
 
+				if (ok) {
 					/*
 					 * Condition to check Amount is multiple of 100
 					 */
@@ -339,9 +399,8 @@ public class Sbi implements Rbi {
 							 */
 							if (newBalance >= 1000) {
 								ac.setBalance(newBalance);
-								System.out.println("Ammount " + withdraw + " withdrawn Successfully....");
+								System.out.println("Amount " + withdraw + " withdrawn Successfully....");
 								System.out.println("-------------------------------------------");
-								attempt--;
 							} else {
 								System.out.println("\nFailed to Withdraw...you can NOT withdraw '" + withdraw
 										+ "' from your current balance '" + balance + " rs.' ");
@@ -367,50 +426,74 @@ public class Sbi implements Rbi {
 					System.out.println("*Minimum Balance to be maintained : 1000 rs.");
 					System.out.println("-------------------------------------------");
 				}
+				subMenu();
 			} else {
-				System.out.println("Inorrect Account Number...");
 				withdrawal();
 			}
-
-		} else {
-			System.out.println("You have Exhausted withdrawal attempt limit of 3 for the day");
-			System.out.println("Please visit after 24 hrs....");
-			System.out.println("-------------------------------------------");
 		}
-		subMenu();
 	}
 
 	public void checkBalance() {
 
-		System.out.print("Enter Account Number: ");
-		int input = sc.nextInt();
-		int accNo = ac.getAccNo();
 		/*
 		 * Condition to Verify Account Number
 		 */
-		if (accNo == input) {
-			System.out.println("Account Number: " + ac.getAccNo());
-			System.out.println("Balance Ammount in your account : " + ac.getBalance());
-			System.out.println("-------------------------------------------");
-		} else {
-			System.out.println("Enter Correct Account Number");
-			checkBalance();
-		}
+		compareAccNo();
+		
+		System.out.println("-------------------------------------------");
+		System.out.println("	*BALANCE CHECK*");
+		System.out.println("Account Number: " + ac.getAccNo());
+		System.out.println("Balance Amount in your account : " + ac.getBalance());
+		System.out.println("-------------------------------------------");
+
 		subMenu();
 	}
 
 	public void initialDeposit() {
-
+		Scanner dep = new Scanner(System.in);
+		double iniDep = 0;
 		System.out.print("Enter amount to deposit initially: ");
-		double iniDep = sc.nextDouble();
-		if (iniDep < 1000) {
-			System.out.println(" !!! To start banking you MUST deposit at least 1000 rs. ");
-			System.out.println("Please try again... ");
-			initialDeposit();
-		} else {
-			ac.setBalance(iniDep);
+		try {
+			iniDep = dep.nextDouble();
+		} catch (Exception e) {
+			System.out.println("! Invalid Entry...");
+		} finally {
+			if (iniDep != 0) {
+				if (iniDep < 1000) {
+					System.out.println(" !!! To start banking you MUST deposit at least 1000 rs. ");
+					System.out.println("Please try again... ");
+					initialDeposit();
+				} else {
+					ac.setBalance(iniDep);
+				}
+			} else {
+				initialDeposit();
+			}
 		}
 
+	}
+
+	public void compareAccNo() {
+		Scanner in = new Scanner(System.in);
+		int inAccNo = 0;
+		System.out.print("Enter Account Number : ");
+		try {
+			inAccNo = in.nextInt();
+		} catch (Exception e) {
+			System.out.println("! Invalid Entry...Try Again...");
+		} finally {
+			if (inAccNo != 0) {
+				int accNo = ac.getAccNo();
+				if (accNo == inAccNo) {
+					System.out.println("Account number matches..");
+				} else {
+					System.out.println("Invalid Account Number...Try Again");
+					compareAccNo();
+				}
+			} else {
+				compareAccNo();
+			}
+		}
 	}
 
 }
