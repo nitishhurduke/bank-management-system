@@ -1,27 +1,32 @@
 package com.braindata.bankmanagement.model;
 
 public class Account {
-	private int accNo;
-	private String name;
-	private long mobNo;
-	private long adharno;
+	private String accNo;
+	private String fname;
+	private String lname;
+	private String mobNo;
+	private String adharno;
 	private String gender;
-	private int age;
+	private String age;
 	private double balance;
 
-	public void setAccNo(int accNo) {
+	public void setAccNo(String accNo) {
 		this.accNo = accNo;
 	}
 
-	public void setName(String name) {
-		this.name = name;
+	public void setFname(String fname) {
+		this.fname = fname;
 	}
 
-	public void setMobNo(long mobNo) {
+	public void setLname(String lname) {
+		this.lname = lname;
+	}
+
+	public void setMobNo(String mobNo) {
 		this.mobNo = mobNo;
 	}
 
-	public void setAdharNo(long adharno) {
+	public void setAdharNo(String adharno) {
 		this.adharno = adharno;
 	}
 
@@ -29,7 +34,7 @@ public class Account {
 		this.gender = gender;
 	}
 
-	public void setAge(int age) {
+	public void setAge(String age) {
 		this.age = age;
 	}
 
@@ -37,19 +42,23 @@ public class Account {
 		this.balance = balance;
 	}
 
-	public int getAccNo() {
+	public String getAccNo() {
 		return accNo;
 	}
 
-	public String getName() {
-		return name;
+	public String getFname() {
+		return fname;
 	}
 
-	public long getMobNo() {
+	public String getLname() {
+		return lname;
+	}
+
+	public String getMobNo() {
 		return mobNo;
 	}
 
-	public long getAdharNo() {
+	public String getAdharNo() {
 		return adharno;
 	}
 
@@ -57,7 +66,7 @@ public class Account {
 		return gender;
 	}
 
-	public int getAge() {
+	public String getAge() {
 		return age;
 	}
 
