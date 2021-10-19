@@ -3,16 +3,13 @@ package com.braindata.bankmanagement.serviceImpl;
 import com.braindata.bankmanagement.service.Rbi;
 import com.braindata.bankmanagement.model.Account;
 import java.util.Scanner;
-import java.util.regex.Pattern;
-import java.util.Random;//To Generate Account Number
 
 public class Sbi implements Rbi {
 
 	Scanner sc = new Scanner(System.in);
-	Account ac = new Account();
-	CreateAccount ca = new CreateAccount();
-	Random random = new Random();
-	boolean flag = false;
+	Account ac = new Account(); //Instance of Account Class ==> Holds information of Customer.
+	CreateAccount ca = new CreateAccount();//Instance of CreateAccount Class ==> Holds all methods to Set Customer Information.
+	boolean accountCreated = false; //To check whether account is created or not before use other banking operations.
 
 	public void mainMenu() {
 
@@ -29,11 +26,9 @@ public class Sbi implements Rbi {
 
 		switch (input) {
 		case "1":
-			if (flag == false) {
-				flag = true;
-				System.out.println("-------------------------------------------");
-				System.out.println("  *REGISTRATION*");
+			if (accountCreated == false) {
 				createAccount();
+				accountCreated = true;
 			} else {
 				System.out.println("Account Already created...Multiple Accounts Feature Comming Soon...");
 				System.out.println("-------------------------------------------");
@@ -42,7 +37,7 @@ public class Sbi implements Rbi {
 			break;
 
 		case "2":
-			if (flag) {
+			if (accountCreated) {
 				System.out.println("-------------------------------------------");
 				displayAllDetails();
 				break;
@@ -55,7 +50,7 @@ public class Sbi implements Rbi {
 
 		case "3":
 
-			if (flag) {
+			if (accountCreated) {
 				System.out.println("-------------------------------------------");
 
 				checkBalance();
@@ -68,7 +63,7 @@ public class Sbi implements Rbi {
 			}
 
 		case "4":
-			if (flag) {
+			if (accountCreated) {
 				System.out.println("-------------------------------------------");
 				System.out.println("	*DEPOSIT MONEY*");
 				compareAccNo();
@@ -82,7 +77,7 @@ public class Sbi implements Rbi {
 			}
 
 		case "5":
-			if (flag) {
+			if (accountCreated) {
 				System.out.println("-------------------------------------------");
 				System.out.println("	*WITHDRAW MONEY*");
 				compareAccNo();
@@ -127,7 +122,8 @@ public class Sbi implements Rbi {
 	}
 
 	public void createAccount() {
-
+		System.out.println("-------------------------------------------");
+		System.out.println("  *REGISTRATION*");
 		/* Code to set Name */
 		ac.setFname(ca.setFname());
 		ac.setLname(ca.setLname());
@@ -138,7 +134,7 @@ public class Sbi implements Rbi {
 		/* Code to set Mobile Number */
 		ac.setMobNo(ca.setMobNo());
 
-		/* Code to set Adhar Number */
+		/* Code to set Aadhaar Number */
 		ac.setAdharNo(ca.setAdhar());
 
 		/* Code to set Gender */
@@ -153,226 +149,11 @@ public class Sbi implements Rbi {
 		ac.setAccNo(ca.generateAccNo());
 
 		System.out.println("\nYOUR ACCOUNT NUMBER IS : " + ac.getAccNo()
-				+ " Please use your Account Number to experience best of our Banking Features");
+				+ " Please use your Account Number to experience the best of our Banking Features");
 		System.out.println("-------------------------------------------");
 		subMenu();
 	}
 
-//	public void setFname() {
-//		System.out.print("Enter First Name : ");
-//		String fname = sc.next();
-//		if (Pattern.matches("[A-Z]{1}[a-z]{1,}", fname)) {
-//			ac.setFname(fname);
-//		} else {
-//			System.out.println("! Invalid First Name..Try Again...");
-//			setFname();
-//		}
-//
-//	}
-//
-//	public void setLname() {
-////		Scanner na = new Scanner(System.in);
-//		System.out.print("Enter Last Name : ");
-//		String lname = sc.next();
-//		if (Pattern.matches("[A-Z]{1}[a-z]{1,}", lname)) {
-//			ac.setLname(lname);
-//		} else {
-//			System.out.println("! Invalid Last Name..Try Again...");
-//			setLname();
-//		}
-//
-//	}
-//
-//	public void setMobNo() {
-//
-//		/* Using regex api */
-//
-//		System.out.print("Enter 10 digit Mobile Number : ");
-//		String mobile = sc.next();
-//
-//		if (Pattern.matches("[7-9]{1}[0-9]{9}", mobile)) {
-//			ac.setMobNo(mobile);
-//		} else {
-//			System.out.println("Invalid Mobile Number Try Again...");
-//			setMobNo();
-//		}
-//
-//		/* Using Exception Handling */
-//		// long mobile = 0;
-//		// Scanner mob = new Scanner(System.in);
-//		// System.out.print("Enter 10 digit Mobile Number : ");
-//		// try {
-//		// mobile = mob.nextLong();
-//		// } catch (Exception e) {
-//		// System.out.println("Invalid Mobile no... Try again...");
-//		// } finally {
-//		// if (mobile != 0) {
-//		// if (mobile >= 000000000 && mobile <= 9999999999l) {
-//		// ac.setMobNo(mobile);
-//		// } else {
-//		// System.out.println("Mobile Number MUST be in 10 digits...Try Again...");
-//		// setMobNo();
-//		// }
-//		//
-//		// } else {
-//		// setMobNo();
-//		// }
-//		//
-//		// }
-//	}
-//
-//	public void setAge() {
-//
-//		/* Using regex api */
-//
-//		System.out.print("Enter Age : ");
-//		String age = sc.next();
-//
-//		if (Pattern.matches("[1-9]{1,3}", age)) {
-//			ac.setAge(age);
-//		} else {
-//			System.out.println("Invalid Age Try Again...");
-//			setAge();
-//		}
-//
-////		Scanner ag = new Scanner(System.in);
-////		int age = 0;
-////		System.out.print("Enter Age: ");
-////		try {
-////			age = ag.nextInt();
-////		} catch (Exception e) {
-////			System.out.println("Invalid Age !! Try again... ");
-////		} finally {
-////			if (age != 0) {
-////				if (age >= 18) {
-////					ac.setAge(age);
-////
-////				} else {
-////
-////					System.out.println(
-////							"You are not Eligible to Create a Bank Account(Eligibility age to create a bank account is 18 or more)");
-////					System.exit(0);
-////				}
-////			} else {
-////				setAge();
-////			}
-////
-////		}
-//	}
-//
-//	public void setAdhar() {
-//		/* Using regex api */
-//
-//		System.out.print("Enter 12 digit Aadhaar Number : ");
-//		String adhar = sc.next();
-//
-//		if (Pattern.matches("[1-9]{1}[0-9]{11}", adhar)) {
-//			ac.setAdharNo(adhar);
-//		} else {
-//			System.out.println("Invalid Aadhaar Number Try Again...");
-//			setAdhar();
-//		}
-//
-////		long adhar = 0;
-////		Scanner ad = new Scanner(System.in);
-////		System.out.print("Enter 12 digit Aadhaar Number : ");
-////		try {
-////			adhar = ad.nextLong();
-////		} catch (Exception e) {
-////			System.out.println("Invalid Aadhaar no... Try again...");
-////		} finally {
-////			if (adhar != 0) {
-////				if (adhar >= 00000000000l && adhar <= 999999999999l) {
-////					ac.setAdharNo(adhar);
-////				} else {
-////					System.out.println("Aadhaar Number MUST be in 12 digits...Try Again...");
-////					setAdhar();
-////				}
-////
-////			} else {
-////				setAdhar();
-////			}
-////
-////		}
-//
-//	}
-//
-//	public void setGender() {
-//
-//		Scanner gen = new Scanner(System.in);
-//		byte input = 117;
-//
-//		System.out.println("Select Gender from below -");
-//		System.out.println("  1.Male");
-//		System.out.println("  2.Female");
-//		System.out.println("  3.Other");
-//
-//		try {
-//			input = gen.nextByte();
-//		} catch (Exception e) {
-//			System.out.println("! Invalid Entry...");
-//		} finally {
-//			if (input != 117) {
-//				switch (input) {
-//				case 1:
-//					ac.setGender("Male");
-//					System.out.println("Selected Gender : " + ac.getGender());
-//					break;
-//				case 2:
-//					ac.setGender("Female");
-//					System.out.println("Selected Gender : " + ac.getGender());
-//					break;
-//				case 3:
-//					ac.setGender("Other");
-//					System.out.println("Selected Gender : " + ac.getGender());
-//					break;
-//				default:
-//					System.out.println("! Choose from given option Only..");
-//					setGender();
-//					break;
-//				}
-//			} else {
-//				setGender();
-//			}
-//		}
-//
-//	}
-//
-//	public void initialDeposit() {
-//		Scanner dep = new Scanner(System.in);
-//		double iniDep = 0;
-//		System.out.print("Enter amount to deposit initially: ");
-//		try {
-//			iniDep = dep.nextDouble();
-//		} catch (Exception e) {
-//			System.out.println("! Invalid Entry...");
-//		} finally {
-//			if (iniDep != 0) {
-//				if (iniDep < 1000) {
-//					System.out.println(" !!! To start banking you MUST deposit at least 1000 rs. ");
-//					System.out.println("Please try again... ");
-//					initialDeposit();
-//				} else {
-//					ac.setBalance(iniDep);
-//				}
-//			} else {
-//				initialDeposit();
-//			}
-//		}
-//
-//	}
-//
-//	public void generateAccNo() {
-//		int min = 1000;
-//		int max = 9999;
-//		int accNo1 = (int) (Math.random() * (max - min + 1) + min);
-//		String acc = Integer.toString(accNo1);
-//		/* Or */
-////		int accNo = random.nextInt(9999);
-//
-//		ac.setAccNo(acc);
-
-//}
 
 	public void displayAllDetails() {
 		System.out.println("	*ACCOUNT DETAILS*");
@@ -389,6 +170,7 @@ public class Sbi implements Rbi {
 	}
 
 	public void depositMoney() {
+		@SuppressWarnings("resource")
 		Scanner sc = new Scanner(System.in);
 		double deposit = 0;
 		System.out.print("Enter Amount to Deposit: ");
@@ -430,6 +212,7 @@ public class Sbi implements Rbi {
 	}
 
 	public void withdrawal() {
+		@SuppressWarnings("resource")
 		Scanner sc = new Scanner(System.in);
 		double balance = ac.getBalance();
 		double withdraw = 0;

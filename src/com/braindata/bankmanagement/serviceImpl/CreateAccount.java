@@ -3,7 +3,6 @@ package com.braindata.bankmanagement.serviceImpl;
 import java.util.Scanner;
 import java.util.regex.Pattern;
 
-import com.braindata.bankmanagement.model.Account;
 
 public class CreateAccount {
 
@@ -71,28 +70,7 @@ public class CreateAccount {
 		return mobile;
 	}
 
-	/* Using Exception Handling */
-	// long mobile = 0;
-	// Scanner mob = new Scanner(System.in);
-	// System.out.print("Enter 10 digit Mobile Number : ");
-	// try {
-	// mobile = mob.nextLong();
-	// } catch (Exception e) {
-	// System.out.println("Invalid Mobile no... Try again...");
-	// } finally {
-	// if (mobile != 0) {
-	// if (mobile >= 000000000 && mobile <= 9999999999l) {
-	// ac.setMobNo(mobile);
-	// } else {
-	// System.out.println("Mobile Number MUST be in 10 digits...Try Again...");
-	// setMobNo();
-	// }
-	//
-	// } else {
-	// setMobNo();
-	// }
-	//
-	// }
+	
 
 	public String setAge() {
 		/* Using regex api */
@@ -111,29 +89,7 @@ public class CreateAccount {
 		}
 		return age;
 	}
-//		Scanner ag = new Scanner(System.in);
-//		int age = 0;
-//		System.out.print("Enter Age: ");
-//		try {
-//			age = ag.nextInt();
-//		} catch (Exception e) {
-//			System.out.println("Invalid Age !! Try again... ");
-//		} finally {
-//			if (age != 0) {
-//				if (age >= 18) {
-//					ac.setAge(age);
-//
-//				} else {
-//
-//					System.out.println(
-//							"You are not Eligible to Create a Bank Account(Eligibility age to create a bank account is 18 or more)");
-//					System.exit(0);
-//				}
-//			} else {
-//				setAge();
-//			}
-//
-//		}
+
 
 	public String setAdhar() {
 		/* Using regex api */
@@ -154,27 +110,7 @@ public class CreateAccount {
 		return adhar;
 	}
 
-//		long adhar = 0;
-//		Scanner ad = new Scanner(System.in);
-//		System.out.print("Enter 12 digit Aadhaar Number : ");
-//		try {
-//			adhar = ad.nextLong();
-//		} catch (Exception e) {
-//			System.out.println("Invalid Aadhaar no... Try again...");
-//		} finally {
-//			if (adhar != 0) {
-//				if (adhar >= 00000000000l && adhar <= 999999999999l) {
-//					ac.setAdharNo(adhar);
-//				} else {
-//					System.out.println("Aadhaar Number MUST be in 12 digits...Try Again...");
-//					setAdhar();
-//				}
-//
-//			} else {
-//				setAdhar();
-//			}
-//
-//		}
+
 
 	public String setGender() {
 
@@ -234,36 +170,12 @@ public class CreateAccount {
 		return iniDep;
 	}
 
-//		Scanner dep = new Scanner(System.in);
-//		double iniDep = 0;
-//		double input = 0;
-//		System.out.print("Enter amount to deposit initially: ");
-//		try {
-//			input = dep.nextDouble();
-//		} catch (Exception e) {
-//			System.out.println("! Invalid Entry...");
-//		} finally {
-//			if (input != 0) {
-//				if (input < 1000) {
-//					System.out.println(" !!! To start banking you MUST deposit at least 1000 rs. ");
-//					System.out.println("Please try again... ");
-//					initialDeposit();
-//				} else {
-//					iniDep = input;
-//				}
-//			} else {
-//				initialDeposit();
-//			}
-//			return iniDep;
-//		}
 
 	public String generateAccNo() {
 		int min = 1000;
 		int max = 9999;
 		int accNo1 = (int) (Math.random() * (max - min + 1) + min);
 		String acc = Integer.toString(accNo1);
-		/* Or */
-//		int accNo = random.nextInt(9999);
 
 		return acc;
 

@@ -1,6 +1,7 @@
 package com.braindata.bankmanagement.model;
 
 public class Account {
+	
 	private String accNo;
 	private String fname;
 	private String lname;
