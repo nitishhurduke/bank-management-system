@@ -80,7 +80,7 @@ public class CreateAccount {
 		System.out.print("Enter Age : ");
 		while (match) {
 			age = sc.next();
-			if (Pattern.matches("[1-9]{1,3}", age)) {
+			if (Pattern.matches("[0-9]{1,3}", age)) {
 				match = false;
 			} else {
 				System.out.println("Invalid Age(Age must be Max. 3 digits) Try Again...");
@@ -172,10 +172,10 @@ public class CreateAccount {
 
 
 	public String generateAccNo() {
-		int min = 1000;
-		int max = 9999;
-		int accNo1 = (int) (Math.random() * (max - min + 1) + min);
-		String acc = Integer.toString(accNo1);
+		long min = 10000000000l;
+		long max = 99999999999l;
+		long accNo1 = (long) (Math.random() * (max - min + 1) + min);
+		String acc = Long.toString(accNo1);
 
 		return acc;
 
