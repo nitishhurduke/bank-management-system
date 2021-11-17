@@ -33,6 +33,7 @@ public class Sbi implements Rbi {
 		System.out.println(" 3.Check Balance");
 		System.out.println(" 4.Deposit Money");
 		System.out.println(" 5.Withdraw Money");
+		System.out.println(" 6.Transfer Money");
 		System.out.println(" 0.Exit");
 
 		String input = sc.next();
@@ -86,6 +87,18 @@ public class Sbi implements Rbi {
 				System.out.println("-------------------------------------------");
 				System.out.println("	*WITHDRAW MONEY*");
 				withdrawal();
+				break;
+			} else {
+				System.out.println("No Account Found..");
+				System.out.println("Create an Account First to Use this Operation");
+				mainMenu();
+				break;
+			}
+		case "6":
+			if (accountCreated) {
+				System.out.println("-------------------------------------------");
+				System.out.println("	*TRANSFER MONEY MONEY*");
+				transfer();
 				break;
 			} else {
 				System.out.println("No Account Found..");
@@ -160,13 +173,14 @@ public class Sbi implements Rbi {
 				+ " Please use your Account Number to experience the best of our Banking Features");
 		System.out.println("-------------------------------------------");
 		accMap.put(ac.getAccNo(), ac);
-		
-		/*Date and Time part*/
+
+		/* Date and Time part */
 		String instance = getDateAndTime();
-		
-		/*Passbook Building part*/
+
+		/* Passbook Building part */
 		String fullname = ac.getFname() + " " + ac.getLname();
-		File passbook = new File(fullname);
+		File passbook = new File(
+				"E:\\CJC Workspace\\Class Java workspace\\BankManagementSystem\\src\\Accounts\\" + fullname);
 		try {
 			passbook.createNewFile();
 			FileWriter fw = new FileWriter(passbook);
@@ -192,7 +206,7 @@ public class Sbi implements Rbi {
 			fw.write("\n");
 			fw.write("    ----* Transactions Details *----");
 			fw.write("\n");
-			fw.write(instance+"        +" + ac.getBalance() + "(Cr)");
+			fw.write(instance + "        +" + ac.getBalance() + "(Cr)");
 			fw.write("\n");
 			fw.write("                           bal(" + ac.getBalance() + ")");
 			fw.write("\n");
@@ -207,6 +221,7 @@ public class Sbi implements Rbi {
 	}
 
 	public void displayAllDetails() {
+		
 		Account ac = compareAccNo();
 		System.out.println("	*ACCOUNT DETAILS*");
 		System.out.println("Customer Account Number: " + ac.getAccNo());
@@ -225,6 +240,7 @@ public class Sbi implements Rbi {
 		@SuppressWarnings("resource")
 		Scanner sc = new Scanner(System.in);
 		Account ac = compareAccNo();
+		System.out.println("Account of "+ac.getFname()+" "+ac.getLname()+"("+ac.getAccNo()+")");
 		double deposit = 0;
 		System.out.print("Enter Amount to Deposit: ");
 		try {
@@ -249,9 +265,12 @@ public class Sbi implements Rbi {
 					String instance = getDateAndTime();
 					String fullname = ac.getFname() + " " + ac.getLname();
 					try {
-						FileWriter fw = new FileWriter(fullname, true);
+						FileWriter fw = new FileWriter(
+								"E:\\CJC Workspace\\Class Java workspace\\BankManagementSystem\\src\\Accounts\\"
+										+ fullname,
+								true);
 						fw.append("\n");
-						fw.append(instance+"        +" + deposit + "(Cr)");
+						fw.append(instance + "        +" + deposit + "(Cr)");
 						fw.append("\n");
 						fw.append("                           bal(" + ac.getBalance() + ")");
 						fw.append("\n");
@@ -284,6 +303,7 @@ public class Sbi implements Rbi {
 		@SuppressWarnings("resource")
 		Scanner sc = new Scanner(System.in);
 		Account ac = compareAccNo();
+		System.out.println("Account of "+ac.getFname()+" "+ac.getLname()+"("+ac.getAccNo()+")");
 		double balance = ac.getBalance();
 		double withdraw = 0;
 		boolean ok = false;
@@ -327,9 +347,12 @@ public class Sbi implements Rbi {
 								String instance = getDateAndTime();
 								String fullname = ac.getFname() + " " + ac.getLname();
 								try {
-									FileWriter fw = new FileWriter(fullname, true);
+									FileWriter fw = new FileWriter(
+											"E:\\CJC Workspace\\Class Java workspace\\BankManagementSystem\\src\\Accounts\\"
+													+ fullname,
+											true);
 									fw.append("\n");
-									fw.append(instance+"         -" + withdraw + "(D)");
+									fw.append(instance + "         -" + withdraw + "(D)");
 									fw.append("\n");
 									fw.append("                           bal(" + ac.getBalance() + ")");
 									fw.append("\n");
@@ -379,8 +402,7 @@ public class Sbi implements Rbi {
 		/*
 		 * Condition to Verify Account Number
 		 */
-
-		System.out.println("-------------------------------------------");
+		
 		Account ac = compareAccNo();
 		System.out.println("	*BALANCE CHECK*");
 		System.out.println("Account Number: " + ac.getAccNo());
@@ -388,6 +410,153 @@ public class Sbi implements Rbi {
 		System.out.println("-------------------------------------------");
 
 		subMenu();
+	}
+
+	public void transfer() {
+		System.out.print("From(Your)      --> ");
+		Account ac = compareAccNo();
+		System.out.println("Your Account : " + ac.getFname() + " " + ac.getLname() + "(" + ac.getAccNo() + ")");
+		System.out.print("To(Benificiary) --> ");
+		Account accBenificiary = compareAccNo();
+		System.out.println("Benificiary Account : " + accBenificiary.getFname() + " " + accBenificiary.getLname() + "("
+				+ accBenificiary.getAccNo() + ")");
+		System.out.println("Confirm by entering '5' to continue or press '0' to change accounts");
+		boolean confirm = false;
+		String ch = sc.next();
+		switch (ch) {
+		case "5":
+			confirm = true;
+			break;
+		case "0":
+			transfer();
+			break;
+		default:
+			System.out.println("Invalid Input..Try Again...");
+			transfer();
+		}
+
+		boolean diffaccnts = false;
+		if (ac != accBenificiary) {
+			diffaccnts = true;
+		} else {
+			System.out.println("Choose Different Accounts");
+			transfer();
+		}
+		Scanner sc = new Scanner(System.in);
+		double balance = ac.getBalance();
+		double transfer = 0;
+		boolean sufficientBalance = false;
+
+		if (balance > 1000) {
+			sufficientBalance = true;
+		} else {
+			transfer();
+		}
+
+		try {
+			/*
+			 * Condition to Check if Current Balance is Already Greater than Minimum Balance
+			 */
+			System.out.print("Enter Amount to Transfer("+ac.getFname()+"-->"+accBenificiary.getFname()+"): ");
+			transfer = sc.nextDouble();
+
+		} catch (Exception e) {
+			System.out.println("! Invalid Entry...Try Again...");
+		} finally {
+			if (confirm) {
+				if (transfer != 0) {
+					if (diffaccnts) {
+						if (sufficientBalance) {
+
+							/*
+							 * Condition to Check Transfer amount is Less than Current Balance
+							 */
+							if (balance >= transfer) {
+								double newBalance = balance - transfer;
+
+								/*
+								 * Condition to ensure New Balance after transfer must be Greater than Minimum
+								 * Balance
+								 */
+								if (newBalance >= 1000) {
+									ac.setBalance(newBalance);
+									accBenificiary.setBalance(accBenificiary.getBalance() + transfer);
+
+									String instance = getDateAndTime();
+									String afullname = ac.getFname() + " " + ac.getLname();
+									String bfullname = accBenificiary.getFname() + " " + accBenificiary.getLname();
+
+									try {
+										FileWriter fw = new FileWriter(
+												"E:\\CJC Workspace\\Class Java workspace\\BankManagementSystem\\src\\Accounts\\"
+														+ afullname,
+												true);
+										fw.append("\n");
+										fw.append(instance + "         -" + transfer + "(D)");
+										fw.append("\n");
+										fw.append(
+												"Transferred to " + bfullname + "(" + accBenificiary.getAccNo() + ")");
+										fw.append("\n");
+										fw.append("                           bal(" + ac.getBalance() + ")");
+										fw.append("\n");
+										fw.flush();
+										fw.close();
+
+										FileWriter fw1 = new FileWriter(
+												"E:\\CJC Workspace\\Class Java workspace\\BankManagementSystem\\src\\Accounts\\"
+														+ bfullname,
+												true);
+										fw1.append("\n");
+										fw1.append(instance + "        +" + transfer + "(Cr)");
+										fw1.append("\n");
+										fw1.append("Transferred from " + afullname + "(" + ac.getAccNo() + ")");
+										fw1.append("\n");
+										fw1.append(
+												"                           bal(" + accBenificiary.getBalance() + ")");
+										fw1.append("\n");
+										fw1.flush();
+										fw1.close();
+
+									} catch (IOException e) {
+										// TODO Auto-generated catch block
+										e.printStackTrace();
+									}
+									System.out.println("Amount " + transfer + " transferred Successfully....");
+									System.out.println("-------------------------------------------");
+								} else {
+									System.out.println("\nFailed to Transfer...you can NOT transfer '" + transfer
+											+ "' from your current balance '" + balance + " rs.' ");
+									System.out.println("You must Maintain MINIMUM BALANCE '1000 rs.'");
+									System.out.println("-------------------------------------------");
+								}
+
+							} else {
+								System.out.println("Insufficent Balance in your account...Try Again");
+								System.out.println("Your Current Balance : " + balance);
+								System.out.println("-------------------------------------------");
+
+							}
+
+						} else {
+							System.out.println(
+									"Failed to Transfer...Your current balance is already at MINIMUM BALANCE aproved ");
+							System.out.println("*Your Current Balance : " + balance + " rs.");
+							System.out.println("*Minimum Balance to be maintained : 1000 rs.");
+							System.out.println("-------------------------------------------");
+						}
+						subMenu();
+					} else {
+
+						subMenu();
+					}
+				} else {
+					transfer();
+				}
+			}else {
+				transfer();
+			}
+		}
+
 	}
 
 	public Account compareAccNo() {
@@ -406,13 +575,16 @@ public class Sbi implements Rbi {
 					return ac;
 				}
 			}
-
+			if(!match)
+			{
+				System.out.println("No Account Found with this number,Please Try Again...");
+			}
 		}
 		return ac;
 
 	}
-	public String getDateAndTime()
-	{
+
+	public String getDateAndTime() {
 		LocalDateTime date = LocalDateTime.now();
 		DateTimeFormatter format = DateTimeFormatter.ofPattern("dd-MM-yyyy HH:mm:ss");
 		String instance = date.format(format);
