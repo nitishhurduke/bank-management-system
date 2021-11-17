@@ -27,6 +27,7 @@ public class Sbi implements Rbi {
 	public void mainMenu() {
 
 		System.out.println("-------------------------------------------");
+		System.out.println(" ----* MAIN MENU *----");
 		System.out.println("Choose from Following operations..");
 		System.out.println("\n 1.Create Account");
 		System.out.println(" 2.Display Account Details");
@@ -72,7 +73,7 @@ public class Sbi implements Rbi {
 		case "4":
 			if (accountCreated) {
 				System.out.println("-------------------------------------------");
-				System.out.println("	*DEPOSIT MONEY*");
+				System.out.println("----* DEPOSIT MONEY *----");
 				depositMoney();
 				break;
 			} else {
@@ -85,7 +86,7 @@ public class Sbi implements Rbi {
 		case "5":
 			if (accountCreated) {
 				System.out.println("-------------------------------------------");
-				System.out.println("	*WITHDRAW MONEY*");
+				System.out.println("----* WITHDRAW MONEY *----");
 				withdrawal();
 				break;
 			} else {
@@ -97,7 +98,7 @@ public class Sbi implements Rbi {
 		case "6":
 			if (accountCreated) {
 				System.out.println("-------------------------------------------");
-				System.out.println("	*TRANSFER MONEY MONEY*");
+				System.out.println("----* TRANSFER MONEY *----");
 				transfer();
 				break;
 			} else {
@@ -140,7 +141,7 @@ public class Sbi implements Rbi {
 
 	public void createAccount() {
 		System.out.println("-------------------------------------------");
-		System.out.println("  *REGISTRATION*");
+		System.out.println("----* REGISTRATION *----");
 		Account ac = new Account();
 		CreateAccount ca = new CreateAccount();// Instance of CreateAccount Class ==> Holds all methods to Set Customer
 		// Information.
@@ -174,56 +175,16 @@ public class Sbi implements Rbi {
 		System.out.println("-------------------------------------------");
 		accMap.put(ac.getAccNo(), ac);
 
-		/* Date and Time part */
-		String instance = getDateAndTime();
-
 		/* Passbook Building part */
-		String fullname = ac.getFname() + " " + ac.getLname();
-		File passbook = new File(
-				"E:\\CJC Workspace\\Class Java workspace\\BankManagementSystem\\src\\Accounts\\" + fullname);
-		try {
-			passbook.createNewFile();
-			FileWriter fw = new FileWriter(passbook);
-			fw.write("		***** PASSBOOK *****");
-			fw.write("\n");
-			fw.write("\n");
-			fw.write("    ----* Account Details *----");
-			fw.write("\n");
-			fw.write(" * Account Number      : " + ac.getAccNo());
-			fw.write("\n");
-			fw.write(" * Account Holders Name: " + ac.getFname() + " " + ac.getLname());
-			fw.write("\n");
-			fw.write(" * Age                 : " + ac.getAge());
-			fw.write("\n");
-			fw.write(" * Gender              : " + ac.getGender());
-			fw.write("\n");
-			fw.write(" * Mobile Number       : " + ac.getMobNo());
-			fw.write("\n");
-			fw.write(" * Aadhaar Number      : " + ac.getAdharNo());
-			fw.write("\n");
-			fw.write("\n");
-			fw.write("---------------------------------------");
-			fw.write("\n");
-			fw.write("    ----* Transactions Details *----");
-			fw.write("\n");
-			fw.write(instance + "        +" + ac.getBalance() + "(Cr)");
-			fw.write("\n");
-			fw.write("                           bal(" + ac.getBalance() + ")");
-			fw.write("\n");
-			fw.flush();
-			fw.close();
-		} catch (IOException e) {
-			System.out.println("File Not written due to some problem");
-
-		}
+		initializePassbook(ac);
 
 		subMenu();
 	}
 
 	public void displayAllDetails() {
-		
+
 		Account ac = compareAccNo();
-		System.out.println("	*ACCOUNT DETAILS*");
+		System.out.println("----* ACCOUNT DETAILS *----");
 		System.out.println("Customer Account Number: " + ac.getAccNo());
 		System.out.println("Customer Name          : " + ac.getFname() + " " + ac.getLname());
 		System.out.println("Mobile Number          : " + ac.getMobNo());
@@ -240,7 +201,7 @@ public class Sbi implements Rbi {
 		@SuppressWarnings("resource")
 		Scanner sc = new Scanner(System.in);
 		Account ac = compareAccNo();
-		System.out.println("Account of "+ac.getFname()+" "+ac.getLname()+"("+ac.getAccNo()+")");
+		System.out.println("Account of " + ac.getFname() + " " + ac.getLname() + "(" + ac.getAccNo() + ")");
 		double deposit = 0;
 		System.out.print("Enter Amount to Deposit: ");
 		try {
@@ -262,25 +223,8 @@ public class Sbi implements Rbi {
 					balance = balance + deposit;
 
 					ac.setBalance(balance);
-					String instance = getDateAndTime();
-					String fullname = ac.getFname() + " " + ac.getLname();
-					try {
-						FileWriter fw = new FileWriter(
-								"E:\\CJC Workspace\\Class Java workspace\\BankManagementSystem\\src\\Accounts\\"
-										+ fullname,
-								true);
-						fw.append("\n");
-						fw.append(instance + "        +" + deposit + "(Cr)");
-						fw.append("\n");
-						fw.append("                           bal(" + ac.getBalance() + ")");
-						fw.append("\n");
-						fw.flush();
-						fw.close();
-
-					} catch (IOException e) {
-						// TODO Auto-generated catch block
-						e.printStackTrace();
-					}
+					boolean check = true;
+					updatePassbook(ac,deposit,check);
 
 					System.out.println(
 							"Congratulations...Amount " + deposit + " deposited in your account successfully....");
@@ -303,7 +247,7 @@ public class Sbi implements Rbi {
 		@SuppressWarnings("resource")
 		Scanner sc = new Scanner(System.in);
 		Account ac = compareAccNo();
-		System.out.println("Account of "+ac.getFname()+" "+ac.getLname()+"("+ac.getAccNo()+")");
+		System.out.println("Account of " + ac.getFname() + " " + ac.getLname() + "(" + ac.getAccNo() + ")");
 		double balance = ac.getBalance();
 		double withdraw = 0;
 		boolean ok = false;
@@ -344,25 +288,10 @@ public class Sbi implements Rbi {
 							 */
 							if (newBalance >= 1000) {
 								ac.setBalance(newBalance);
-								String instance = getDateAndTime();
-								String fullname = ac.getFname() + " " + ac.getLname();
-								try {
-									FileWriter fw = new FileWriter(
-											"E:\\CJC Workspace\\Class Java workspace\\BankManagementSystem\\src\\Accounts\\"
-													+ fullname,
-											true);
-									fw.append("\n");
-									fw.append(instance + "         -" + withdraw + "(D)");
-									fw.append("\n");
-									fw.append("                           bal(" + ac.getBalance() + ")");
-									fw.append("\n");
-									fw.flush();
-									fw.close();
+								boolean check = false;
+//								updatePassbokWith(ac, withdraw);
+								updatePassbook(ac, newBalance, check);
 
-								} catch (IOException e) {
-									// TODO Auto-generated catch block
-									e.printStackTrace();
-								}
 								System.out.println("Amount " + withdraw + " withdrawn Successfully....");
 								System.out.println("-------------------------------------------");
 							} else {
@@ -402,9 +331,9 @@ public class Sbi implements Rbi {
 		/*
 		 * Condition to Verify Account Number
 		 */
-		
+
 		Account ac = compareAccNo();
-		System.out.println("	*BALANCE CHECK*");
+		System.out.println("----* BALANCE CHECK *----");
 		System.out.println("Account Number: " + ac.getAccNo());
 		System.out.println("Balance Amount in your account : " + ac.getBalance());
 		System.out.println("-------------------------------------------");
@@ -457,7 +386,7 @@ public class Sbi implements Rbi {
 			/*
 			 * Condition to Check if Current Balance is Already Greater than Minimum Balance
 			 */
-			System.out.print("Enter Amount to Transfer("+ac.getFname()+"-->"+accBenificiary.getFname()+"): ");
+			System.out.print("Enter Amount to Transfer(" + ac.getFname() + "-->" + accBenificiary.getFname() + "): ");
 			transfer = sc.nextDouble();
 
 		} catch (Exception e) {
@@ -482,45 +411,8 @@ public class Sbi implements Rbi {
 									ac.setBalance(newBalance);
 									accBenificiary.setBalance(accBenificiary.getBalance() + transfer);
 
-									String instance = getDateAndTime();
-									String afullname = ac.getFname() + " " + ac.getLname();
-									String bfullname = accBenificiary.getFname() + " " + accBenificiary.getLname();
+									updatePassbok(ac, accBenificiary, transfer);
 
-									try {
-										FileWriter fw = new FileWriter(
-												"E:\\CJC Workspace\\Class Java workspace\\BankManagementSystem\\src\\Accounts\\"
-														+ afullname,
-												true);
-										fw.append("\n");
-										fw.append(instance + "         -" + transfer + "(D)");
-										fw.append("\n");
-										fw.append(
-												"Transferred to " + bfullname + "(" + accBenificiary.getAccNo() + ")");
-										fw.append("\n");
-										fw.append("                           bal(" + ac.getBalance() + ")");
-										fw.append("\n");
-										fw.flush();
-										fw.close();
-
-										FileWriter fw1 = new FileWriter(
-												"E:\\CJC Workspace\\Class Java workspace\\BankManagementSystem\\src\\Accounts\\"
-														+ bfullname,
-												true);
-										fw1.append("\n");
-										fw1.append(instance + "        +" + transfer + "(Cr)");
-										fw1.append("\n");
-										fw1.append("Transferred from " + afullname + "(" + ac.getAccNo() + ")");
-										fw1.append("\n");
-										fw1.append(
-												"                           bal(" + accBenificiary.getBalance() + ")");
-										fw1.append("\n");
-										fw1.flush();
-										fw1.close();
-
-									} catch (IOException e) {
-										// TODO Auto-generated catch block
-										e.printStackTrace();
-									}
 									System.out.println("Amount " + transfer + " transferred Successfully....");
 									System.out.println("-------------------------------------------");
 								} else {
@@ -552,11 +444,120 @@ public class Sbi implements Rbi {
 				} else {
 					transfer();
 				}
-			}else {
+			} else {
 				transfer();
 			}
 		}
 
+	}
+
+	public void initializePassbook(Account ac) {
+		/* Date and Time part */
+		String instance = getDateAndTime();
+		String fullname = ac.getFname() + " " + ac.getLname();
+
+		File passbook = new File(
+				"E:\\CJC Workspace\\Class Java workspace\\BankManagementSystem\\src\\Accounts\\" + fullname);
+		// File passbook = new File(fullname);
+
+		try {
+			passbook.createNewFile();
+			FileWriter fw = new FileWriter(passbook);
+			fw.write("		***** PASSBOOK *****");
+			fw.write("\n");
+			fw.write("\n");
+			fw.write("    ----* Account Details *----");
+			fw.write("\n");
+			fw.write(" * Account Number      : " + ac.getAccNo());
+			fw.write("\n");
+			fw.write(" * Account Holders Name: " + ac.getFname() + " " + ac.getLname());
+			fw.write("\n");
+			fw.write(" * Age                 : " + ac.getAge());
+			fw.write("\n");
+			fw.write(" * Gender              : " + ac.getGender());
+			fw.write("\n");
+			fw.write(" * Mobile Number       : " + ac.getMobNo());
+			fw.write("\n");
+			fw.write(" * Aadhaar Number      : " + ac.getAdharNo());
+			fw.write("\n");
+			fw.write("\n");
+			fw.write("---------------------------------------");
+			fw.write("\n");
+			fw.write("    ----* Transactions Details *----");
+			fw.write("\n");
+			fw.write(instance + "        +" + ac.getBalance() + "(Cr)");
+			fw.write("\n");
+			fw.write("                           bal(" + ac.getBalance() + ")");
+			fw.write("\n");
+			fw.flush();
+			fw.close();
+		} catch (IOException e) {
+			System.out.println("File Not written due to some problem");
+
+		}
+	}
+
+	public void updatePassbook(Account ac, double amount,boolean check) {
+		String instance = getDateAndTime();
+		String fullname = ac.getFname() + " " + ac.getLname();
+		try {
+			FileWriter fw = new FileWriter(
+					"E:\\CJC Workspace\\Class Java workspace\\BankManagementSystem\\src\\Accounts\\" + fullname, true);
+			// FileWriter fw = new FileWriter(fullname,true);
+			fw.append("\n");
+			if(check) {
+			fw.append(instance + "        +" + amount + "(Cr)");
+			}else {
+			fw.append(instance + "         -" + amount + "(D)");	
+			}
+			fw.append("\n");
+			fw.append("                           bal(" + ac.getBalance() + ")");
+			fw.append("\n");
+			fw.flush();
+			fw.close();
+
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+	}
+	
+	public void updatePassbok(Account ac, Account accBenificiary, double transfer) {
+		String instance = getDateAndTime();
+		String afullname = ac.getFname() + " " + ac.getLname();
+		String bfullname = accBenificiary.getFname() + " " + accBenificiary.getLname();
+
+		try {
+			FileWriter fw = new FileWriter(
+					"E:\\CJC Workspace\\Class Java workspace\\BankManagementSystem\\src\\Accounts\\" + afullname, true);
+//			FileWriter fw = new FileWriter( afullname,true);
+			fw.append("\n");
+			fw.append(instance + "         -" + transfer + "(D)");
+			fw.append("\n");
+			fw.append("Transferred to " + bfullname + "(" + accBenificiary.getAccNo() + ")");
+			fw.append("\n");
+			fw.append("                           bal(" + ac.getBalance() + ")");
+			fw.append("\n");
+			fw.flush();
+			fw.close();
+
+			FileWriter fw1 = new FileWriter(
+					"E:\\CJC Workspace\\Class Java workspace\\BankManagementSystem\\src\\Accounts\\"
+							+ bfullname,
+					true);
+//			FileWriter fw1 = new FileWriter(bfullname, true);
+			fw1.append("\n");
+			fw1.append(instance + "        +" + transfer + "(Cr)");
+			fw1.append("\n");
+			fw1.append("Transferred from " + afullname + "(" + ac.getAccNo() + ")");
+			fw1.append("\n");
+			fw1.append("                           bal(" + accBenificiary.getBalance() + ")");
+			fw1.append("\n");
+			fw1.flush();
+			fw1.close();
+
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
 	}
 
 	public Account compareAccNo() {
@@ -575,8 +576,7 @@ public class Sbi implements Rbi {
 					return ac;
 				}
 			}
-			if(!match)
-			{
+			if (!match) {
 				System.out.println("No Account Found with this number,Please Try Again...");
 			}
 		}
@@ -590,28 +590,4 @@ public class Sbi implements Rbi {
 		String instance = date.format(format);
 		return instance;
 	}
-
-//	public void compareAccNo() {
-//		Scanner in = new Scanner(System.in);
-//		String inAccNo = null;
-//		System.out.print("Enter Account Number : ");
-//		try {
-//			inAccNo = in.next();
-//		} catch (Exception e) {
-//			System.out.println("! Invalid Entry...Try Again...");
-//		} finally {
-//			if (inAccNo != null) {
-//				String accNo = ac.getAccNo();
-//				if (accNo.equals(inAccNo)) {
-//					System.out.println("Account number matches..");
-//				} else {
-//					System.out.println("Invalid Account Number...Try Again");
-//					compareAccNo();
-//				}
-//			} else {
-//				compareAccNo();
-//			}
-//		}
-//	}
-//
 }
