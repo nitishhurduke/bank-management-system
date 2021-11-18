@@ -81,7 +81,15 @@ public class CreateAccount {
 		while (match) {
 			age = sc.next();
 			if (Pattern.matches("[0-9]{1,3}", age)) {
-				match = false;
+				int ageInt = Integer.parseInt(age);
+				if(ageInt > 16)
+				{
+					match = false;
+					
+				}else {
+					System.out.println("Age must be above 16 to create a Bank Account ");
+					System.out.print("Enter Valid age : ");
+				}
 			} else {
 				System.out.println("Invalid Age(Age must be Max. 3 digits) Try Again...");
 				System.out.print("Enter a valid Age Number : ");

@@ -18,6 +18,7 @@ public class Sbi implements Rbi {
 
 	Scanner sc = new Scanner(System.in);
 	Map<String, Account> accMap = new HashMap<>();
+	int count = 0;
 
 	// Instance of Account Class ==> Holds information of Customer.
 
@@ -35,13 +36,14 @@ public class Sbi implements Rbi {
 		System.out.println(" 4.Deposit Money");
 		System.out.println(" 5.Withdraw Money");
 		System.out.println(" 6.Transfer Money");
+		System.out.println(" 7.Delete Account");
 		System.out.println(" 0.Exit");
 
 		String input = sc.next();
 
 		switch (input) {
 		case "1":
-			accountCreated = true;
+
 			createAccount();
 			break;
 
@@ -96,14 +98,24 @@ public class Sbi implements Rbi {
 				break;
 			}
 		case "6":
-			if (accountCreated) {
+			if (count > 1) {
 				System.out.println("-------------------------------------------");
 				System.out.println("----* TRANSFER MONEY *----");
 				transfer();
 				break;
 			} else {
-				System.out.println("No Account Found..");
-				System.out.println("Create an Account First to Use this Operation");
+				System.out.println("Atleast TWO Accounts needed to use this operation..");
+				mainMenu();
+				break;
+			}
+		case "7":
+			if (accountCreated) {
+				System.out.println("-------------------------------------------");
+				System.out.println("----* DELETE ACCOUNT *----");
+				deleteAccount();
+				break;
+			} else {
+				System.out.println("No Account Found to Delete..");
 				mainMenu();
 				break;
 			}
@@ -119,6 +131,34 @@ public class Sbi implements Rbi {
 
 		}
 
+	}
+
+	public void deleteAccount() {
+		Account ac = compareAccNo();
+		System.out.println("Account Of : "+ac.getFname()+" "+ac.getLname()+"("+ac.getAccNo()+")");
+		System.out.println("WARNING: This action is Non-reversible,Once deleted, All the data associated with this account will be removed Permenantly");
+		System.out.println("Confirm by entering '1' to Continue or press '5' to Change Account or '0' to Main Menu" );
+		boolean confirm = false;
+		String ch = sc.next();
+		switch (ch) {
+		case "1":
+			confirm = true;
+			break;
+		case "5":
+			deleteAccount();
+			break;
+		case "0":
+			mainMenu();
+			break;
+		default:
+			System.out.println("Invalid Input..Try Again...");
+			deleteAccount();
+		}
+		if (confirm) {
+			accMap.remove(ac.getAccNo());
+			System.out.println("Account Deleted SuccessFully...");
+		}
+		subMenu();
 	}
 
 	public void subMenu() {
@@ -177,6 +217,8 @@ public class Sbi implements Rbi {
 
 		/* Passbook Building part */
 		initializePassbook(ac);
+		accountCreated = true;
+		count++;
 
 		subMenu();
 	}
@@ -224,7 +266,7 @@ public class Sbi implements Rbi {
 
 					ac.setBalance(balance);
 					boolean check = true;
-					updatePassbook(ac,deposit,check);
+					updatePassbook(ac, deposit, check);
 
 					System.out.println(
 							"Congratulations...Amount " + deposit + " deposited in your account successfully....");
@@ -457,16 +499,18 @@ public class Sbi implements Rbi {
 		String fullname = ac.getFname() + " " + ac.getLname();
 
 		File passbook = new File(
-				"E:\\CJC Workspace\\Class Java workspace\\BankManagementSystem\\src\\Accounts\\" + fullname);
-		// File passbook = new File(fullname);
+				"E:\\CJC Workspace\\Class Java workspace\\BankManagementSystem\\src\\Accounts\\" + fullname + ".txt");
+//		 File passbook = new File("\\user.dir\\Accounts\\"+fullname+".txt");
 
 		try {
 			passbook.createNewFile();
 			FileWriter fw = new FileWriter(passbook);
-			fw.write("		***** PASSBOOK *****");
+			fw.write("\n");
+			fw.write("          ***** PASSBOOK *****");
 			fw.write("\n");
 			fw.write("\n");
-			fw.write("    ----* Account Details *----");
+			fw.write("      ----* Account Details *----");
+			fw.write("\n");
 			fw.write("\n");
 			fw.write(" * Account Number      : " + ac.getAccNo());
 			fw.write("\n");
@@ -483,7 +527,9 @@ public class Sbi implements Rbi {
 			fw.write("\n");
 			fw.write("---------------------------------------");
 			fw.write("\n");
+			fw.write("\n");
 			fw.write("    ----* Transactions Details *----");
+			fw.write("\n");
 			fw.write("\n");
 			fw.write(instance + "        +" + ac.getBalance() + "(Cr)");
 			fw.write("\n");
@@ -497,18 +543,20 @@ public class Sbi implements Rbi {
 		}
 	}
 
-	public void updatePassbook(Account ac, double amount,boolean check) {
+	public void updatePassbook(Account ac, double amount, boolean check) {
 		String instance = getDateAndTime();
 		String fullname = ac.getFname() + " " + ac.getLname();
 		try {
 			FileWriter fw = new FileWriter(
-					"E:\\CJC Workspace\\Class Java workspace\\BankManagementSystem\\src\\Accounts\\" + fullname, true);
-			// FileWriter fw = new FileWriter(fullname,true);
+					"E:\\CJC Workspace\\Class Java workspace\\BankManagementSystem\\src\\Accounts\\" + fullname
+							+ ".txt",
+					true);
+//			 FileWriter fw = new FileWriter("\\user.dir\\Accounts\\"+fullname+".txt",true);
 			fw.append("\n");
-			if(check) {
-			fw.append(instance + "        +" + amount + "(Cr)");
-			}else {
-			fw.append(instance + "         -" + amount + "(D)");	
+			if (check) {
+				fw.append(instance + "        +" + amount + "(Cr)");
+			} else {
+				fw.append(instance + "         -" + amount + "(D)");
 			}
 			fw.append("\n");
 			fw.append("                           bal(" + ac.getBalance() + ")");
@@ -520,7 +568,7 @@ public class Sbi implements Rbi {
 			e.printStackTrace();
 		}
 	}
-	
+
 	public void updatePassbok(Account ac, Account accBenificiary, double transfer) {
 		String instance = getDateAndTime();
 		String afullname = ac.getFname() + " " + ac.getLname();
@@ -528,8 +576,10 @@ public class Sbi implements Rbi {
 
 		try {
 			FileWriter fw = new FileWriter(
-					"E:\\CJC Workspace\\Class Java workspace\\BankManagementSystem\\src\\Accounts\\" + afullname, true);
-//			FileWriter fw = new FileWriter( afullname,true);
+					"E:\\CJC Workspace\\Class Java workspace\\BankManagementSystem\\src\\Accounts\\" + afullname
+							+ ".txt",
+					true);
+//			FileWriter fw = new FileWriter( "\\user.dir\\Accounts\\"+afullname+".txt",true);
 			fw.append("\n");
 			fw.append(instance + "         -" + transfer + "(D)");
 			fw.append("\n");
@@ -541,10 +591,10 @@ public class Sbi implements Rbi {
 			fw.close();
 
 			FileWriter fw1 = new FileWriter(
-					"E:\\CJC Workspace\\Class Java workspace\\BankManagementSystem\\src\\Accounts\\"
-							+ bfullname,
+					"E:\\CJC Workspace\\Class Java workspace\\BankManagementSystem\\src\\Accounts\\" + bfullname
+							+ ".txt",
 					true);
-//			FileWriter fw1 = new FileWriter(bfullname, true);
+//			FileWriter fw1 = new FileWriter("\\user.dir\\Accounts\\"+bfullname+".txt", true);
 			fw1.append("\n");
 			fw1.append(instance + "        +" + transfer + "(Cr)");
 			fw1.append("\n");
@@ -556,8 +606,9 @@ public class Sbi implements Rbi {
 			fw1.close();
 
 		} catch (IOException e) {
-			e.printStackTrace();
+			System.out.println("Problem while writting file");
 		}
+
 	}
 
 	public Account compareAccNo() {
