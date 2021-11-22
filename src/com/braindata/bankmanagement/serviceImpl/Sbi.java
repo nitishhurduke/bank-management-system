@@ -1,11 +1,14 @@
 package com.braindata.bankmanagement.serviceImpl;
 
 import com.braindata.bankmanagement.service.Rbi;
+import com.braindata.bankmanagement.Database.Dao;
 import com.braindata.bankmanagement.model.Account;
 
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.HashMap;
@@ -17,17 +20,38 @@ import java.util.regex.Pattern;
 public class Sbi implements Rbi {
 
 	Scanner sc = new Scanner(System.in);
-	Map<String, Account> accMap = new HashMap<>();
-	int count = 0;
+	public Map<String, Account> accMap = new HashMap<>();
+	public int count = 0;
 
 	// Instance of Account Class ==> Holds information of Customer.
 
-	boolean accountCreated = false; // To check whether account is created or not before use other banking
+	public boolean accountCreated = false; // To check whether account is created or not before use other banking
 									// operations.
+	public void initializeDataBase() {
+		ResultSet rs = Dao.executeQuery("Select * from customer_data");
+		try {
+			while (rs.next()) {
+				Account ac = new Account();
 
+				ac.setAccNo(rs.getString(1));
+				ac.setFname(rs.getString(2));
+				ac.setLname(rs.getString(3));
+				ac.setMobNo(rs.getString(4));
+				ac.setAdharNo(rs.getString(5));
+				ac.setGender(rs.getString(6));
+				ac.setAge(rs.getString(7));
+				ac.setBalance(rs.getDouble(8));
+				
+				accMap.put(ac.getAccNo(), ac);
+				count++;
+				accountCreated = true;
+			}
+		} catch (SQLException e) {
+			System.out.println("Problem while retieving data");
+		}
+	} 
 	public void mainMenu() {
-
-		System.out.println("-------------------------------------------");
+		
 		System.out.println(" ----* MAIN MENU *----");
 		System.out.println("Choose from Following operations..");
 		System.out.println("\n 1.Create Account");
@@ -43,13 +67,14 @@ public class Sbi implements Rbi {
 
 		switch (input) {
 		case "1":
-
+			System.out.println("------------------------");
+			System.out.println("----* REGISTRATION *----");
 			createAccount();
 			break;
 
 		case "2":
 			if (accountCreated) {
-				System.out.println("-------------------------------------------");
+				System.out.println("---------------------------");
 				displayAllDetails();
 				break;
 			} else {
@@ -62,7 +87,7 @@ public class Sbi implements Rbi {
 		case "3":
 
 			if (accountCreated) {
-				System.out.println("-------------------------------------------");
+				System.out.println("-------------------------");
 				checkBalance();
 				break;
 			} else {
@@ -74,7 +99,7 @@ public class Sbi implements Rbi {
 
 		case "4":
 			if (accountCreated) {
-				System.out.println("-------------------------------------------");
+				System.out.println("-------------------------");
 				System.out.println("----* DEPOSIT MONEY *----");
 				depositMoney();
 				break;
@@ -87,7 +112,7 @@ public class Sbi implements Rbi {
 
 		case "5":
 			if (accountCreated) {
-				System.out.println("-------------------------------------------");
+				System.out.println("--------------------------");
 				System.out.println("----* WITHDRAW MONEY *----");
 				withdrawal();
 				break;
@@ -99,7 +124,7 @@ public class Sbi implements Rbi {
 			}
 		case "6":
 			if (count > 1) {
-				System.out.println("-------------------------------------------");
+				System.out.println("--------------------------");
 				System.out.println("----* TRANSFER MONEY *----");
 				transfer();
 				break;
@@ -110,7 +135,7 @@ public class Sbi implements Rbi {
 			}
 		case "7":
 			if (accountCreated) {
-				System.out.println("-------------------------------------------");
+				System.out.println("--------------------------");
 				System.out.println("----* DELETE ACCOUNT *----");
 				deleteAccount();
 				break;
@@ -133,34 +158,6 @@ public class Sbi implements Rbi {
 
 	}
 
-	public void deleteAccount() {
-		Account ac = compareAccNo();
-		System.out.println("Account Of : "+ac.getFname()+" "+ac.getLname()+"("+ac.getAccNo()+")");
-		System.out.println("WARNING: This action is Non-reversible,Once deleted, All the data associated with this account will be removed Permenantly");
-		System.out.println("Confirm by entering '1' to Continue or press '5' to Change Account or '0' to Main Menu" );
-		boolean confirm = false;
-		String ch = sc.next();
-		switch (ch) {
-		case "1":
-			confirm = true;
-			break;
-		case "5":
-			deleteAccount();
-			break;
-		case "0":
-			mainMenu();
-			break;
-		default:
-			System.out.println("Invalid Input..Try Again...");
-			deleteAccount();
-		}
-		if (confirm) {
-			accMap.remove(ac.getAccNo());
-			System.out.println("Account Deleted SuccessFully...");
-		}
-		subMenu();
-	}
-
 	public void subMenu() {
 
 		System.out.println("Enter '5' for Main Menu Or '0' for Exit");
@@ -180,8 +177,7 @@ public class Sbi implements Rbi {
 	}
 
 	public void createAccount() {
-		System.out.println("-------------------------------------------");
-		System.out.println("----* REGISTRATION *----");
+		
 		Account ac = new Account();
 		CreateAccount ca = new CreateAccount();// Instance of CreateAccount Class ==> Holds all methods to Set Customer
 		// Information.
@@ -217,6 +213,10 @@ public class Sbi implements Rbi {
 
 		/* Passbook Building part */
 		initializePassbook(ac);
+		
+		/*pushing Account details into Database*/
+		pushAccountIntoDatabase(ac);
+		
 		accountCreated = true;
 		count++;
 
@@ -266,8 +266,10 @@ public class Sbi implements Rbi {
 
 					ac.setBalance(balance);
 					boolean check = true;
-					updatePassbook(ac, deposit, check);
-
+				
+					updatePassbook(ac, deposit, check);//Update PassBook
+					updateDatabase(ac);
+					
 					System.out.println(
 							"Congratulations...Amount " + deposit + " deposited in your account successfully....");
 					System.out.println("-------------------------------------------");
@@ -330,10 +332,12 @@ public class Sbi implements Rbi {
 							 */
 							if (newBalance >= 1000) {
 								ac.setBalance(newBalance);
+								
 								boolean check = false;
 //								updatePassbokWith(ac, withdraw);
 								updatePassbook(ac, newBalance, check);
-
+								updateDatabase(ac);
+								
 								System.out.println("Amount " + withdraw + " withdrawn Successfully....");
 								System.out.println("-------------------------------------------");
 							} else {
@@ -454,6 +458,8 @@ public class Sbi implements Rbi {
 									accBenificiary.setBalance(accBenificiary.getBalance() + transfer);
 
 									updatePassbok(ac, accBenificiary, transfer);
+									updateDatabase(accBenificiary);
+									updateDatabase(ac);
 
 									System.out.println("Amount " + transfer + " transferred Successfully....");
 									System.out.println("-------------------------------------------");
@@ -491,6 +497,49 @@ public class Sbi implements Rbi {
 			}
 		}
 
+	}
+
+	public void deleteAccount() {
+		Account ac = compareAccNo();
+		System.out.println("Account Of : " + ac.getFname() + " " + ac.getLname() + "(" + ac.getAccNo() + ")");
+		System.out.println(
+				"WARNING: This action is Non-reversible,Once deleted, All the data associated with this account will be removed Permenantly");
+		System.out.println("Confirm by entering '1' to Continue or press '5' to Change Account or '0' to Main Menu");
+		boolean confirm = false;
+		String ch = sc.next();
+		switch (ch) {
+		case "1":
+			confirm = true;
+			break;
+		case "5":
+			deleteAccount();
+			break;
+		case "0":
+			mainMenu();
+			break;
+		default:
+			System.out.println("Invalid Input..Try Again...");
+			deleteAccount();
+		}
+		if (confirm) {
+			accMap.remove(ac.getAccNo());
+			Dao.execute("Delete from customer_data where accNo = "+ac.getAccNo());
+			System.out.println("Account Deleted SuccessFully...");
+		}
+		subMenu();
+	}
+
+	public void pushAccountIntoDatabase(Account ac) {
+		String query = "insert into customer_data values('" + ac.getAccNo() + "','" + ac.getFname() + "','"
+				+ ac.getLname() + "','" + ac.getMobNo() + "','" + ac.getAdharNo() + "','" + ac.getGender() + "','"
+				+ ac.getAge() + "','" + ac.getBalance() + "')";
+		
+		Dao.execute(query);
+	}
+	public void updateDatabase(Account ac) {
+		
+		String query = "update customer_data set balance = "+ac.getBalance()+" where accNo = "+ac.getAccNo();
+		Dao.execute(query);
 	}
 
 	public void initializePassbook(Account ac) {

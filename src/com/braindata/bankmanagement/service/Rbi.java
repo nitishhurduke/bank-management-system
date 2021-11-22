@@ -13,5 +13,7 @@ public interface Rbi {
 	public void checkBalance();
 	
 	public void mainMenu();
+	
+	public void initializeDataBase();
 
 }

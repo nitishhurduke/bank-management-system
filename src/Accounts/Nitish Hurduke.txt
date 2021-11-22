@@ -1,0 +1,18 @@
+
+          ***** PASSBOOK *****
+
+      ----* Account Details *----
+
+ * Account Number      : 35016368586
+ * Account Holders Name: Nitish Hurduke
+ * Age                 : 27
+ * Gender              : Male
+ * Mobile Number       : 8669015989
+ * Aadhaar Number      : 548983840190
+
+---------------------------------------
+
+    ----* Transactions Details *----
+
+22-11-2021 22:42:36        +4500.0(Cr)
+                           bal(4500.0)
