@@ -2,12 +2,12 @@ package com.braindata.bankmanagement.client;
 
 
 import com.braindata.bankmanagement.service.Rbi;
-import com.braindata.bankmanagement.serviceImpl.Sbi;
+import com.braindata.bankmanagement.serviceImpl.Bank;
 
-public class Test {
+public class Application {
 	public static void main(String args[]) {
 
-		Rbi bank = new Sbi();
+		Rbi bank = new Bank();
 		bank.initializeDataBase();
 		bank.mainMenu();
 	}

@@ -5,6 +5,7 @@ public class Account {
 	private String accNo;
 	private String fname;
 	private String lname;
+	private String fullname;
 	private String mobNo;
 	private String adharno;
 	private String gender;
@@ -73,5 +74,8 @@ public class Account {
 
 	public double getBalance() {
 		return balance;
+	}
+	public String getFullName() {
+		return fname+" "+lname;
 	}
 }

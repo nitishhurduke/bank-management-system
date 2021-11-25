@@ -1,0 +1,25 @@
+
+          ***** PASSBOOK *****
+
+      ----* Account Details *----
+
+ * Account Number      : 27387862463
+ * Account Holders Name: Pravin Patil
+ * Age                 : 23
+ * Gender              : Male
+ * Mobile Number       : 8654785986
+ * Aadhaar Number      : 546523545896
+
+---------------------------------------
+
+    ----* Transactions Details *----
+
+2021-11-25 06:07:48        +8000.0(Cr)
+                           bal(8000.0)
+
+2021-11-25 06:13:24        +1785.5(Cr)
+                           bal(9785.5)
+
+2021-11-25 06:17:19         -1600.0(D)
+Transferred to Nitish Hurduke(89131536695)
+                           bal(8185.5)

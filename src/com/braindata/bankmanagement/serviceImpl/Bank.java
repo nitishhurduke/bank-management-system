@@ -17,40 +17,15 @@ import java.util.Scanner;
 import java.util.Set;
 import java.util.regex.Pattern;
 
-public class Sbi implements Rbi {
+public class Bank implements Rbi {
 
 	Scanner sc = new Scanner(System.in);
 	public Map<String, Account> accMap = new HashMap<>();
-	public int count = 0;
+	public int totalAccounts = 0;
 
 	// Instance of Account Class ==> Holds information of Customer.
 
-	public boolean accountCreated = false; // To check whether account is created or not before use other banking
-									// operations.
-	public void initializeDataBase() {
-		ResultSet rs = Dao.executeQuery("Select * from customer_data");
-		try {
-			while (rs.next()) {
-				Account ac = new Account();
-
-				ac.setAccNo(rs.getString(1));
-				ac.setFname(rs.getString(2));
-				ac.setLname(rs.getString(3));
-				ac.setMobNo(rs.getString(4));
-				ac.setAdharNo(rs.getString(5));
-				ac.setGender(rs.getString(6));
-				ac.setAge(rs.getString(7));
-				ac.setBalance(rs.getDouble(8));
-				
-				accMap.put(ac.getAccNo(), ac);
-				count++;
-				accountCreated = true;
-			}
-		} catch (SQLException e) {
-			System.out.println("Problem while retieving data");
-		}
-	} 
-	public void mainMenu() {
+public void mainMenu() {
 		
 		System.out.println(" ----* MAIN MENU *----");
 		System.out.println("Choose from Following operations..");
@@ -73,7 +48,7 @@ public class Sbi implements Rbi {
 			break;
 
 		case "2":
-			if (accountCreated) {
+			if (totalAccounts>0) {
 				System.out.println("---------------------------");
 				displayAllDetails();
 				break;
@@ -86,7 +61,7 @@ public class Sbi implements Rbi {
 
 		case "3":
 
-			if (accountCreated) {
+			if (totalAccounts>0) {
 				System.out.println("-------------------------");
 				checkBalance();
 				break;
@@ -98,7 +73,7 @@ public class Sbi implements Rbi {
 			}
 
 		case "4":
-			if (accountCreated) {
+			if (totalAccounts>0) {
 				System.out.println("-------------------------");
 				System.out.println("----* DEPOSIT MONEY *----");
 				depositMoney();
@@ -111,7 +86,7 @@ public class Sbi implements Rbi {
 			}
 
 		case "5":
-			if (accountCreated) {
+			if (totalAccounts>0) {
 				System.out.println("--------------------------");
 				System.out.println("----* WITHDRAW MONEY *----");
 				withdrawal();
@@ -123,7 +98,7 @@ public class Sbi implements Rbi {
 				break;
 			}
 		case "6":
-			if (count > 1) {
+			if (totalAccounts > 1) {
 				System.out.println("--------------------------");
 				System.out.println("----* TRANSFER MONEY *----");
 				transfer();
@@ -134,7 +109,7 @@ public class Sbi implements Rbi {
 				break;
 			}
 		case "7":
-			if (accountCreated) {
+			if (totalAccounts>0) {
 				System.out.println("--------------------------");
 				System.out.println("----* DELETE ACCOUNT *----");
 				deleteAccount();
@@ -201,25 +176,27 @@ public class Sbi implements Rbi {
 		/* Code to get and Check if Initial Deposit is Greater than or equal 1000 rs. */
 		ac.setBalance(ca.initialDeposit());
 
-		System.out.println("\nCongratulations!! Account successfully created.....");
+		
 
 		/* Code to Generate Account Number */
 		ac.setAccNo(ca.generateAccNo());
+		
 
+		/*pushing Account details into Customers data Table in Database*/
+		pushAccountIntoDatabase(ac);
+		
+		/*Building Passbook and Initializing Transactions' Table of Customerin Database */
+		initializePassbook(ac);
+		
+		
+		accMap.put(ac.getAccNo(), ac);
+		totalAccounts++;
+		
+		System.out.println("\nCongratulations!! Account successfully created.....");
 		System.out.println("\nYOUR ACCOUNT NUMBER IS : " + ac.getAccNo()
 				+ " Please use your Account Number to experience the best of our Banking Features");
 		System.out.println("-------------------------------------------");
-		accMap.put(ac.getAccNo(), ac);
-
-		/* Passbook Building part */
-		initializePassbook(ac);
 		
-		/*pushing Account details into Database*/
-		pushAccountIntoDatabase(ac);
-		
-		accountCreated = true;
-		count++;
-
 		subMenu();
 	}
 
@@ -335,7 +312,7 @@ public class Sbi implements Rbi {
 								
 								boolean check = false;
 //								updatePassbokWith(ac, withdraw);
-								updatePassbook(ac, newBalance, check);
+								updatePassbook(ac, withdraw, check);
 								updateDatabase(ac);
 								
 								System.out.println("Amount " + withdraw + " withdrawn Successfully....");
@@ -523,6 +500,8 @@ public class Sbi implements Rbi {
 		}
 		if (confirm) {
 			accMap.remove(ac.getAccNo());
+			totalAccounts--; 
+
 			Dao.execute("Delete from customer_data where accNo = "+ac.getAccNo());
 			System.out.println("Account Deleted SuccessFully...");
 		}
@@ -533,20 +512,49 @@ public class Sbi implements Rbi {
 		String query = "insert into customer_data values('" + ac.getAccNo() + "','" + ac.getFname() + "','"
 				+ ac.getLname() + "','" + ac.getMobNo() + "','" + ac.getAdharNo() + "','" + ac.getGender() + "','"
 				+ ac.getAge() + "','" + ac.getBalance() + "')";
-		
 		Dao.execute(query);
+		
+		String query2 = "create table "+ac.getAccNo()+ac.getFname()+"_"+ac.getLname()+" ( TransactionID INT primary key AUTO_INCREMENT , DatenTime DATETIME ,TransactionType VARCHAR(6) , amount DOUBLE , balance DOUBLE)";
+		Dao.execute(query2);
 	}
 	public void updateDatabase(Account ac) {
+		
 		
 		String query = "update customer_data set balance = "+ac.getBalance()+" where accNo = "+ac.getAccNo();
 		Dao.execute(query);
 	}
 
+	// Instance of Account Class ==> Holds information of Customer.
+	
+	//	public boolean accountCreated = false; // To check whether account is created or not before use other banking
+										// operations.
+		public void initializeDataBase() {
+			ResultSet rs = Dao.executeQuery("Select * from customer_data");
+			try {
+				while (rs.next()) {
+					Account ac = new Account();
+	
+					ac.setAccNo(rs.getString(1));
+					ac.setFname(rs.getString(2));
+					ac.setLname(rs.getString(3));
+					ac.setMobNo(rs.getString(4));
+					ac.setAdharNo(rs.getString(5));
+					ac.setGender(rs.getString(6));
+					ac.setAge(rs.getString(7));
+					ac.setBalance(rs.getDouble(8));
+					
+					accMap.put(ac.getAccNo(), ac);
+					totalAccounts++;
+				}
+			} catch (SQLException e) {
+				System.out.println("Problem while retrieving data");
+			}
+		}
 	public void initializePassbook(Account ac) {
 		/* Date and Time part */
 		String instance = getDateAndTime();
 		String fullname = ac.getFname() + " " + ac.getLname();
-
+		
 		File passbook = new File(
 				"E:\\CJC Workspace\\Class Java workspace\\BankManagementSystem\\src\\Accounts\\" + fullname + ".txt");
 //		 File passbook = new File("\\user.dir\\Accounts\\"+fullname+".txt");
@@ -586,14 +594,30 @@ public class Sbi implements Rbi {
 			fw.write("\n");
 			fw.flush();
 			fw.close();
+			recordTransacton(ac, true, instance, ac.getBalance());
 		} catch (IOException e) {
 			System.out.println("File Not written due to some problem");
 
 		}
 	}
 
+	public void recordTransacton(Account ac,boolean credit,String instance,double amount) {
+	//		Insert into 65346026442nitish_hurduke(DateTime, TransactionType, amount, balance) values ('1994-08-28 12:10:50','Debit',5000,50000);
+			
+			String type = null;
+			if(credit)
+			{
+				type = "Credit";
+			}else {
+				type = "Debit";
+			}
+			String query = "Insert Into "+ac.getAccNo()+ac.getFname()+"_"+ac.getLname()+"(DatenTime, TransactionType, amount, balance) values ('"+instance+"','"+type+"',"+amount+","+ac.getBalance()+")";
+			Dao.execute(query);
+		}
+
 	public void updatePassbook(Account ac, double amount, boolean check) {
 		String instance = getDateAndTime();
+		recordTransacton(ac, check, instance, amount);
 		String fullname = ac.getFname() + " " + ac.getLname();
 		try {
 			FileWriter fw = new FileWriter(
@@ -602,9 +626,9 @@ public class Sbi implements Rbi {
 					true);
 //			 FileWriter fw = new FileWriter("\\user.dir\\Accounts\\"+fullname+".txt",true);
 			fw.append("\n");
-			if (check) {
+			if (check) { // Deposit Transaction 
 				fw.append(instance + "        +" + amount + "(Cr)");
-			} else {
+			} else {//Withdraw Transaction
 				fw.append(instance + "         -" + amount + "(D)");
 			}
 			fw.append("\n");
@@ -622,6 +646,9 @@ public class Sbi implements Rbi {
 		String instance = getDateAndTime();
 		String afullname = ac.getFname() + " " + ac.getLname();
 		String bfullname = accBenificiary.getFname() + " " + accBenificiary.getLname();
+		
+		recordTransacton(ac, false, instance, transfer);
+		recordTransacton(accBenificiary, true, instance, transfer);
 
 		try {
 			FileWriter fw = new FileWriter(
@@ -686,7 +713,7 @@ public class Sbi implements Rbi {
 
 	public String getDateAndTime() {
 		LocalDateTime date = LocalDateTime.now();
-		DateTimeFormatter format = DateTimeFormatter.ofPattern("dd-MM-yyyy HH:mm:ss");
+		DateTimeFormatter format = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
 		String instance = date.format(format);
 		return instance;
 	}
