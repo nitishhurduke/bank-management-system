@@ -7,22 +7,25 @@ import java.sql.SQLException;
 import java.sql.Statement;
 
 public class Dao {
-
+	static Connection con;
+	static Statement st;
+	
 	public static Statement connection() {
-		Statement st = null;
+			
 		try {
-			Class.forName("com.mysql.jdbc.Driver");
-			Connection con = DriverManager.getConnection("jdbc:mysql://localhost:3306/bankmanagement", "root", "root");
-			st = con.createStatement();
-		} catch (Exception e) {
-			System.out.println("Problem occured while establishing connection");
+			st = getCon().createStatement();
+		} catch (SQLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
 		}
+			System.out.println("Problem occured while establishing connection");
 		return st;
 	}
 
 	public static void execute(String query) {
-		Statement st = connection();
+		
 		try {
+			st = getCon().createStatement();
 			st.execute(query);
 		} catch (SQLException e) {
 			System.out.println("Problem while excecuting Query");
@@ -31,13 +34,23 @@ public class Dao {
 
 	public static ResultSet executeQuery(String query) {
 		ResultSet rs = null;
-		Statement st = connection();
+		
 		try {
+			st = getCon().createStatement();
 			rs = st.executeQuery(query);
 		} catch (SQLException e) {
 			System.out.println("Problem while executing data retieving query");
 		}
 		return rs;
+	}
+	public static Connection getCon() {
+		try {
+			Class.forName("com.mysql.jdbc.Driver");
+			 con = DriverManager.getConnection("jdbc:mysql://localhost:3306/bankmanagement", "root", "root");
+		}catch (Exception e) {
+			e.printStackTrace();
+		}
+			 return con;
 	}
 
 }

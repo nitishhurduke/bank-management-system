@@ -7,6 +7,9 @@ import com.braindata.bankmanagement.model.Account;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.sql.CallableStatement;
+import java.sql.Connection;
+import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.time.LocalDateTime;
@@ -25,8 +28,8 @@ public class Bank implements Rbi {
 
 	// Instance of Account Class ==> Holds information of Customer.
 
-public void mainMenu() {
-		
+	public void mainMenu() {
+
 		System.out.println(" ----* MAIN MENU *----");
 		System.out.println("Choose from Following operations..");
 		System.out.println("\n 1.Create Account");
@@ -48,7 +51,7 @@ public void mainMenu() {
 			break;
 
 		case "2":
-			if (totalAccounts>0) {
+			if (totalAccounts > 0) {
 				System.out.println("---------------------------");
 				displayAllDetails();
 				break;
@@ -61,7 +64,7 @@ public void mainMenu() {
 
 		case "3":
 
-			if (totalAccounts>0) {
+			if (totalAccounts > 0) {
 				System.out.println("-------------------------");
 				checkBalance();
 				break;
@@ -73,7 +76,7 @@ public void mainMenu() {
 			}
 
 		case "4":
-			if (totalAccounts>0) {
+			if (totalAccounts > 0) {
 				System.out.println("-------------------------");
 				System.out.println("----* DEPOSIT MONEY *----");
 				depositMoney();
@@ -86,7 +89,7 @@ public void mainMenu() {
 			}
 
 		case "5":
-			if (totalAccounts>0) {
+			if (totalAccounts > 0) {
 				System.out.println("--------------------------");
 				System.out.println("----* WITHDRAW MONEY *----");
 				withdrawal();
@@ -109,7 +112,7 @@ public void mainMenu() {
 				break;
 			}
 		case "7":
-			if (totalAccounts>0) {
+			if (totalAccounts > 0) {
 				System.out.println("--------------------------");
 				System.out.println("----* DELETE ACCOUNT *----");
 				deleteAccount();
@@ -152,7 +155,7 @@ public void mainMenu() {
 	}
 
 	public void createAccount() {
-		
+
 		Account ac = new Account();
 		CreateAccount ca = new CreateAccount();// Instance of CreateAccount Class ==> Holds all methods to Set Customer
 		// Information.
@@ -176,27 +179,30 @@ public void mainMenu() {
 		/* Code to get and Check if Initial Deposit is Greater than or equal 1000 rs. */
 		ac.setBalance(ca.initialDeposit());
 
-		
-
 		/* Code to Generate Account Number */
 		ac.setAccNo(ca.generateAccNo());
 		
+		/*Getting Date And Time instance*/
+		String instance = getDateAndTime();
 
-		/*pushing Account details into Customers data Table in Database*/
+		/* pushing Account details into Customers data Table in Database */
 		pushAccountIntoDatabase(ac);
-		
-		/*Building Passbook and Initializing Transactions' Table of Customerin Database */
-		initializePassbook(ac);
-		
+		recordTransacton(ac, true, instance, ac.getBalance());
+
+		/*
+		 * Building Passbook and Initializing Transactions' Table of Customer in
+		 * Database
+		 */
+		initializePassbook(ac,instance);
 		
 		accMap.put(ac.getAccNo(), ac);
 		totalAccounts++;
-		
+
 		System.out.println("\nCongratulations!! Account successfully created.....");
 		System.out.println("\nYOUR ACCOUNT NUMBER IS : " + ac.getAccNo()
 				+ " Please use your Account Number to experience the best of our Banking Features");
 		System.out.println("-------------------------------------------");
-		
+
 		subMenu();
 	}
 
@@ -243,10 +249,10 @@ public void mainMenu() {
 
 					ac.setBalance(balance);
 					boolean check = true;
-				
-					updatePassbook(ac, deposit, check);//Update PassBook
+
+					updatePassbook(ac, deposit, check);// Update PassBook
 					updateDatabase(ac);
-					
+
 					System.out.println(
 							"Congratulations...Amount " + deposit + " deposited in your account successfully....");
 					System.out.println("-------------------------------------------");
@@ -309,12 +315,12 @@ public void mainMenu() {
 							 */
 							if (newBalance >= 1000) {
 								ac.setBalance(newBalance);
-								
+
 								boolean check = false;
 //								updatePassbokWith(ac, withdraw);
 								updatePassbook(ac, withdraw, check);
 								updateDatabase(ac);
-								
+
 								System.out.println("Amount " + withdraw + " withdrawn Successfully....");
 								System.out.println("-------------------------------------------");
 							} else {
@@ -500,61 +506,83 @@ public void mainMenu() {
 		}
 		if (confirm) {
 			accMap.remove(ac.getAccNo());
-			totalAccounts--; 
-
-			Dao.execute("Delete from customer_data where accNo = "+ac.getAccNo());
+			totalAccounts--;
+			try {
+				CallableStatement cs = Dao.getCon().prepareCall("{call deleteAccount(?) }");
+				cs.setString(1, ac.getAccNo());
+				cs.execute();
+			} catch (Exception e) {
+				// TODO: handle exception
+			}
+		
+			
+//			Dao.execute("Delete from customer_data where accNo = " + ac.getAccNo());
 			System.out.println("Account Deleted SuccessFully...");
 		}
 		subMenu();
 	}
 
 	public void pushAccountIntoDatabase(Account ac) {
-		String query = "insert into customer_data values('" + ac.getAccNo() + "','" + ac.getFname() + "','"
-				+ ac.getLname() + "','" + ac.getMobNo() + "','" + ac.getAdharNo() + "','" + ac.getGender() + "','"
-				+ ac.getAge() + "','" + ac.getBalance() + "')";
-		Dao.execute(query);
-		
-		String query2 = "create table "+ac.getAccNo()+ac.getFname()+"_"+ac.getLname()+" ( TransactionID INT primary key AUTO_INCREMENT , DatenTime DATETIME ,TransactionType VARCHAR(6) , amount DOUBLE , balance DOUBLE)";
+		/* Insert into Using Prepared Statement */
+		try {
+			Connection con = Dao.getCon();
+			String query = "INSERT INTO customer_data VALUES(?,?,?,?,?,?,?,?)";
+			PreparedStatement ps = con.prepareStatement(query);
+			ps.setString(1, ac.getAccNo());
+			ps.setString(2, ac.getFname());
+			ps.setString(3, ac.getLname());
+			ps.setString(4, ac.getMobNo());
+			ps.setString(5, ac.getAdharNo());
+			ps.setString(6, ac.getGender());
+			ps.setString(7, ac.getAge());
+			ps.setDouble(8, ac.getBalance());
+			ps.execute();
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+
+		String query2 = "create table " + ac.getAccNo() + ac.getFname() + "_" + ac.getLname()
+				+ " ( TransactionID INT primary key AUTO_INCREMENT , DatenTime DATETIME ,TransactionType VARCHAR(6) , amount DOUBLE , balance DOUBLE)";
 		Dao.execute(query2);
 	}
+
 	public void updateDatabase(Account ac) {
-		
-		
-		String query = "update customer_data set balance = "+ac.getBalance()+" where accNo = "+ac.getAccNo();
+
+		String query = "update customer_data set balance = " + ac.getBalance() + " where accNo = " + ac.getAccNo();
 		Dao.execute(query);
 	}
 
-	// Instance of Account Class ==> Holds information of Customer.
-	
-	//	public boolean accountCreated = false; // To check whether account is created or not before use other banking
-										// operations.
-		public void initializeDataBase() {
-			ResultSet rs = Dao.executeQuery("Select * from customer_data");
-			try {
-				while (rs.next()) {
-					Account ac = new Account();
-	
-					ac.setAccNo(rs.getString(1));
-					ac.setFname(rs.getString(2));
-					ac.setLname(rs.getString(3));
-					ac.setMobNo(rs.getString(4));
-					ac.setAdharNo(rs.getString(5));
-					ac.setGender(rs.getString(6));
-					ac.setAge(rs.getString(7));
-					ac.setBalance(rs.getDouble(8));
-					
-					accMap.put(ac.getAccNo(), ac);
-					totalAccounts++;
-				}
-			} catch (SQLException e) {
-				System.out.println("Problem while retrieving data");
+	public void initializeDataBase() {
+
+		try {
+
+			CallableStatement cs = Dao.getCon().prepareCall("{call getAllData()}");
+			ResultSet rs = cs.executeQuery();
+			while (rs.next()) {
+				Account ac = new Account();
+
+				ac.setAccNo(rs.getString(1));
+				ac.setFname(rs.getString(2));
+				ac.setLname(rs.getString(3));
+				ac.setMobNo(rs.getString(4));
+				ac.setAdharNo(rs.getString(5));
+				ac.setGender(rs.getString(6));
+				ac.setAge(rs.getString(7));
+				ac.setBalance(rs.getDouble(8));
+
+				accMap.put(ac.getAccNo(), ac);
+				totalAccounts++;
 			}
+		} catch (SQLException e) {
+			System.out.println("Problem while retrieving data");
 		}
-	public void initializePassbook(Account ac) {
+	}
+
+	public void initializePassbook(Account ac,String instance) {
 		/* Date and Time part */
-		String instance = getDateAndTime();
-		String fullname = ac.getFname() + " " + ac.getLname();
 		
+		String fullname = ac.getFname() + " " + ac.getLname();
+
 		File passbook = new File(
 				"E:\\CJC Workspace\\Class Java workspace\\BankManagementSystem\\src\\Accounts\\" + fullname + ".txt");
 //		 File passbook = new File("\\user.dir\\Accounts\\"+fullname+".txt");
@@ -594,26 +622,26 @@ public void mainMenu() {
 			fw.write("\n");
 			fw.flush();
 			fw.close();
-			recordTransacton(ac, true, instance, ac.getBalance());
 		} catch (IOException e) {
 			System.out.println("File Not written due to some problem");
 
 		}
 	}
 
-	public void recordTransacton(Account ac,boolean credit,String instance,double amount) {
-	//		Insert into 65346026442nitish_hurduke(DateTime, TransactionType, amount, balance) values ('1994-08-28 12:10:50','Debit',5000,50000);
-			
-			String type = null;
-			if(credit)
-			{
-				type = "Credit";
-			}else {
-				type = "Debit";
-			}
-			String query = "Insert Into "+ac.getAccNo()+ac.getFname()+"_"+ac.getLname()+"(DatenTime, TransactionType, amount, balance) values ('"+instance+"','"+type+"',"+amount+","+ac.getBalance()+")";
-			Dao.execute(query);
+	public void recordTransacton(Account ac, boolean credit, String instance, double amount) {
+		// Insert into transactions (accNo,instance, txnType, amount,
+		// balance) values (45685475854,'1994-08-28 12:10:50','Debit',5000,50000);
+
+		String type = null;
+		if (credit) {
+			type = "Credit";
+		} else {
+			type = "Debit";
 		}
+		String query = "Insert Into transactions(accNo,txnTime, txnType, amount, balance) values ('"+ac.getAccNo()+"','" + instance + "','" + type + "'," + amount
+				+ "," + ac.getBalance() + ")";
+		Dao.execute(query);
+	}
 
 	public void updatePassbook(Account ac, double amount, boolean check) {
 		String instance = getDateAndTime();
@@ -626,9 +654,9 @@ public void mainMenu() {
 					true);
 //			 FileWriter fw = new FileWriter("\\user.dir\\Accounts\\"+fullname+".txt",true);
 			fw.append("\n");
-			if (check) { // Deposit Transaction 
+			if (check) { // Deposit Transaction
 				fw.append(instance + "        +" + amount + "(Cr)");
-			} else {//Withdraw Transaction
+			} else {// Withdraw Transaction
 				fw.append(instance + "         -" + amount + "(D)");
 			}
 			fw.append("\n");
@@ -646,7 +674,7 @@ public void mainMenu() {
 		String instance = getDateAndTime();
 		String afullname = ac.getFname() + " " + ac.getLname();
 		String bfullname = accBenificiary.getFname() + " " + accBenificiary.getLname();
-		
+
 		recordTransacton(ac, false, instance, transfer);
 		recordTransacton(accBenificiary, true, instance, transfer);
 
@@ -695,6 +723,14 @@ public void mainMenu() {
 		while (!match) {
 			System.out.print("Enter Account Number : ");
 			inAccNo = sc.next();
+
+//			 accMap.forEach((accNo,acc)->
+//			 { 
+//				 if (inAccNo.equals(acc.getAccNo())) {
+//					match = true;
+//					ac = acc; }
+//		     });
+
 			Set<String> keys = accMap.keySet();
 			for (String key : keys) {
 				ac = accMap.get(key);
