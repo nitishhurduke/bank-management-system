@@ -3,7 +3,7 @@
 
       ----* Account Details *----
 
- * Account Number      : 97174625147
+ * Account Number      : 53179407644
  * Account Holders Name: Nitish Hurduke
  * Age                 : 27
  * Gender              : Male
@@ -14,15 +14,11 @@
 
     ----* Transactions Details *----
 
-2021-12-03 19:57:43        +5000.0(Cr)
+2021-12-04 13:02:23        +5000.0(Cr)
                            bal(5000.0)
 
-2021-12-03 20:03:50        +1000.0(Cr)
-                           bal(6000.0)
+2021-12-04 13:04:27        +1500.0(Cr)
+                           bal(6500.0)
 
-2021-12-03 20:05:42         -2500.0(D)
-                           bal(3500.0)
-
-2021-12-03 20:10:17        +1500.0(Cr)
-Transferred from Pravin Patil(49304657850)
-                           bal(5000.0)
+2021-12-04 13:05:05         -4100.0(D)
+                           bal(2400.0)
